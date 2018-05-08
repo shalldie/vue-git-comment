@@ -1,0 +1,37 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es6": true,
+        "node": true
+    },
+    "parser": "babel-eslint",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module"
+    },
+    "rules": {
+        "no-const-assign": 1,
+        "no-this-before-super": 1,
+        "no-undef": 1,
+        "no-unreachable": 1,
+        "no-unused-vars": 1,
+        "constructor-super": 1,
+        "valid-typeof": 1,
+        "indent": [
+            2,
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
+        "no-caller": 2,
+        "no-eval": 2,
+        "semi": 0,
+        "no-eq-null": 0,
+        "no-unused-expressions": 0,
+        "no-loop-func": 2
+    }
+}
