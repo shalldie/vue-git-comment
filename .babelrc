@@ -1,13 +1,6 @@
 {
     "presets": [
-        [
-            "env",
-            {
-                "useBuiltIns": true
-            }
-        ]
-    ],
-    "plugins": [
-        "transform-object-rest-spread"
+        "env",
+        "stage-2"
     ]
 }

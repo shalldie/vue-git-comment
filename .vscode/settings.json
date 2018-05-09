@@ -1,4 +1,3 @@
 {
-    "eslint.enable": true,
-    "vsicons.presets.angular": false
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true
 }

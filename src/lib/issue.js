@@ -1,28 +1,35 @@
-import axios from "axios";
-
-const http = axios.create({
-    baseURL: 'https://api.github.com'
-});
+import http from './http';
 
 /**
- * 获取所有issue列表
+ * 找到第一个符合的issue
  *
  * @export
  * @param {string} owner 仓库所有者
  * @param {string} repo 仓库名称
  * @param {string} labels labels 用逗号分隔
- * @returns {Promise<Array<string>>}
+ * @returns {any>}
  */
-export async function getIssueList(owner, repo, labels) {
-    const { data } = await http.get(`/repos/${owner}/${repo}/issues`, {
-        headers: {
-            Accept: 'application/vnd.github.symmetra-preview+json'
-        },
-        params: {
-            creator: owner,
-            labels
-        }
-    });
-    return data;
+export function getFirstIssue(owner, repo, labels) {
+    return http.get(`/repos/${owner}/${repo}/issues`, {
+        creator: owner,
+        labels
+    }).then(body => JSON.parse(body)[0]);
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {any} owner
+ * @param {any} repo
+ * @param {any} number
+ * @returns
+ */
+export function getIssue(owner, repo, number) {
+    return http.get(`/repos/${owner}/${repo}/issues/${number}`)
+        .then(body => JSON.parse(body));
+}
+
+export function getRateLimit() {
+    return http.get(`/rate_limit`);
+}
