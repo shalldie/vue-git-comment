@@ -22,8 +22,11 @@ import gitComment from './git-comment';
 
 gitComment.config(auth);
 
-if (!gitComment.ifLogin) {
+if (!gitComment.state.ifLogin) {
     // gitComment.login();
+}
+else {
+    gitComment.getUserInfo();
 }
 
 window.gitComment = gitComment;

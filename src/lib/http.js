@@ -1,5 +1,5 @@
 import Deferred from './Deferred';
-import gitComment from '../git-comment';
+import state from '../state';
 import { stringifyQuery, appendQuery } from "./utils";
 
 const baseUrl = 'https://api.github.com';
@@ -41,8 +41,8 @@ function ajax(method, url, data = {}, proxy = false) {
 
     xh.open(method, url, true);
     // xh.setRequestHeader('Accept', 'application/vnd.github.symmetra-preview+json');
-    if (gitComment.access_token) {
-        xh.setRequestHeader('Authorization', `token ${gitComment.access_token}`);
+    if (state.access_token) {
+        xh.setRequestHeader('Authorization', `token ${state.access_token}`);
     }
     if (method === 'POST') {
         xh.setRequestHeader('Content-Type', 'application/json');

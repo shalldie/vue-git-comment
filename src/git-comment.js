@@ -1,5 +1,6 @@
+import state from './state';
 import { appendQuery, getQuery } from "./lib/utils";
-import http from "./lib/http";
+import * as github from './lib/github';
 
 const STORAGE_TOKEN_KEY = 'STORAGE_TOKEN_KEY';
 
@@ -11,26 +12,15 @@ class GitComment {
      */
     config(options) {
         const { client_id, client_secret } = options;
-        this.client_id = client_id;
-        this.client_secret = client_secret;
+        state.client_id = client_id;
+        state.client_secret = client_secret;
         this.init();
     }
 
     //#region fields
 
-    client_id = ''
-
-    client_secret = ''
-
-    access_token = ''
-
-    /**
-     * 是否登陆
-     *
-     * @memberof GitHub
-     */
-    ifLogin = false
-
+    state = state
+    
     //#endregion
 
     //#region private methods
@@ -67,16 +57,12 @@ class GitComment {
      * @memberof GitComment
      */
     _getToken(code) {
-        http.post('https://github.com/login/oauth/access_token', {
-            client_id: this.client_id,
-            client_secret: this.client_secret,
-            code
-        }, true)
-            .then(body => {
-                let token = getQuery(body, 'access_token');
+        let replaceUrl = getQuery(window.location.search, 'state');
+        replaceUrl = decodeURIComponent(replaceUrl);
+
+        github.getToken(state.client_id, state.client_secret, code)
+            .then(token => {
                 this._updateToken(token);
-                let replaceUrl = getQuery(window.location.search, 'state');
-                replaceUrl = decodeURIComponent(replaceUrl);
                 window.history.replaceState(null, null, replaceUrl);
             })
             .catch(err => console.log(err));
@@ -90,14 +76,14 @@ class GitComment {
      */
     _updateToken(token) {
         if (token && token.length) {
-            this.ifLogin = true;
-            this.access_token = token;
+            state.ifLogin = true;
+            state.access_token = token;
         }
         else {
-            this.ifLogin = false;
-            this.access_token = '';
+            state.ifLogin = false;
+            state.access_token = '';
         }
-        window.localStorage.setItem(STORAGE_TOKEN_KEY, this.access_token);
+        window.localStorage.setItem(STORAGE_TOKEN_KEY, state.access_token);
     }
 
     //#endregion
@@ -110,14 +96,11 @@ class GitComment {
      * @memberof GitHub
      */
     login() {
-        let url = 'https://github.com/login/oauth/authorize';
-        url = appendQuery(url, {
-            client_id: this.client_id,
-            redirect_uri: window.location.href,
-            scope: 'public_repo',
-            state: window.location.href
-        });
-        window.location.href = url;
+        github.toAuthorize(state.client_id);
+    }
+
+    getUserInfo() {
+        github.getAuthUser().then(body => console.log(body));
     }
 
     //#endregion
