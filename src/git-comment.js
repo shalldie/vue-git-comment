@@ -42,10 +42,8 @@ class GitComment {
      */
     init() {
         this._updateToken(localStorage.getItem(STORAGE_TOKEN_KEY));
-        if (!this.ifLogin) {
-            // 如果重定向回来，就去获取token并存下来
-            this._checkBack();
-        }
+        // 如果重定向回来，就去获取token并存下来
+        this._checkBack();
     }
 
     /**
@@ -54,7 +52,9 @@ class GitComment {
      * @memberof GitComment
      */
     _checkBack() {
-        if (~window.location.search.indexOf('code')) {
+        const search = window.location.search;
+        // 如果是跳转回来的页面，即包含 code 和 state
+        if (/code=|state=/.test(search)) {
             let code = getQuery(window.location.search, 'code');
             this._getToken(code);
         }

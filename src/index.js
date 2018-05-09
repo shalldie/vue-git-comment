@@ -27,3 +27,4 @@ if (!gitComment.ifLogin) {
 }
 
 window.gitComment = gitComment;
+console.log(gitComment);
