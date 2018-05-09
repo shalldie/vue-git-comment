@@ -54,7 +54,7 @@ class GitComment {
     _checkBack() {
         const search = window.location.search;
         // 如果是跳转回来的页面，即包含 code 和 state
-        if (/code=|state=/.test(search)) {
+        if (/(?=\S*code=\S*)(?=\S*state=\S*)/.test(search)) {
             let code = getQuery(window.location.search, 'code');
             this._getToken(code);
         }
