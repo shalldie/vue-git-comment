@@ -1,26 +1,40 @@
 import state from './state';
+import render from './render';
 import { appendQuery, getQuery } from "./lib/utils";
 import * as github from './lib/github';
+// import './styles/github-markdown.css';
+import './styles/git-comment.scss';
+import { WSAETIMEDOUT } from 'constants';
 
-const STORAGE_TOKEN_KEY = 'STORAGE_TOKEN_KEY';
+/**
+ * https://github.com/shalldie/git-comment
+ *
+ * @license MIT License
+ * @description 一个基于 issue 的评论插件。
+ * @author shalldie
+ */
+
+const GIT_COMMENT_ACCESS_STOKEN = 'GIT_COMMENT_ACCESS_STOKEN';
 
 class GitComment {
     /**
      * 配置初始化信息
-     * @param {{client_id:string,client_secret:string}} options
+     * @param {{el:HTMLElement,client_id:string,client_secret:string}} options
      * @memberof GitComment
      */
     config(options) {
-        const { client_id, client_secret } = options;
-        state.client_id = client_id;
-        state.client_secret = client_secret;
+        // const { client_id, client_secret } = options;
+        // state.client_id = client_id;
+        // state.client_secret = client_secret;
+        Object.assign(state, options);
         this.init();
+        render.renderContainer(state.el);
     }
 
     //#region fields
 
     state = state
-    
+
     //#endregion
 
     //#region private methods
@@ -31,7 +45,7 @@ class GitComment {
      * @memberof GitComment
      */
     init() {
-        this._updateToken(localStorage.getItem(STORAGE_TOKEN_KEY));
+        this._updateToken(localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN));
         // 如果重定向回来，就去获取token并存下来
         this._checkBack();
     }
@@ -83,7 +97,7 @@ class GitComment {
             state.ifLogin = false;
             state.access_token = '';
         }
-        window.localStorage.setItem(STORAGE_TOKEN_KEY, state.access_token);
+        window.localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, state.access_token);
     }
 
     //#endregion
@@ -99,8 +113,23 @@ class GitComment {
         github.toAuthorize(state.client_id);
     }
 
+    /**
+     * 退出
+     *
+     * @memberof GitComment
+     */
+    logOut() {
+        state.ifLogin = false;
+        state.access_token = '';
+        window.localStorage.removeItem(GIT_COMMENT_ACCESS_STOKEN);
+    }
+
     getUserInfo() {
-        github.getAuthUser().then(body => console.log(body));
+        github.getAuthUser().then(body => console.log(body))
+            .catch(err => {  // token失效，未登录状态
+                console.log(err);
+                this.logOut();
+            });
     }
 
     //#endregion

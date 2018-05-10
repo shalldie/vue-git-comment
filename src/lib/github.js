@@ -33,12 +33,27 @@ export function getIssue(owner, repo, number) {
 }
 
 /**
- * 获取token
- * 
+ * 获取当前使用的issue
+ *
  * @export
- * @param {string} client_id 
- * @param {string} client_secret 
- * @param {string} code 
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string} labels
+ */
+export function getCurrentIssue(owner, repo, labels) {
+    getFirstIssue(owner, repo, labels)
+        .then(issue => {
+
+        });
+}
+
+/**
+ * 获取token
+ *
+ * @export
+ * @param {string} client_id
+ * @param {string} client_secret
+ * @param {string} code
  * @returns {Promise<string>}
  */
 export function getToken(client_id, client_secret, code) {
@@ -53,9 +68,9 @@ export function getToken(client_id, client_secret, code) {
 
 /**
  * 跳转去认证
- * 
+ *
  * @export
- * @param {string} client_id 
+ * @param {string} client_id
  */
 export function toAuthorize(client_id) {
     let url = 'https://github.com/login/oauth/authorize';
@@ -69,5 +84,5 @@ export function toAuthorize(client_id) {
 }
 
 export function getAuthUser() {
-    return http.get('/user');
+    return http.get('/user').then(body => JSON.parse(body));
 }

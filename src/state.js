@@ -2,6 +2,12 @@
  * 当前状态和全局数据
  */
 export default {
+
+    /**
+     * @type {HTMLElement}
+     */
+    el: null,
+
     client_id: '',
 
     client_secret: '',
@@ -11,5 +17,9 @@ export default {
     /**
      * 是否登录
      */
-    ifLogin: false
+    ifLogin: false,
+
+    userInfo: {
+        avatar_url: ''
+    }
 };

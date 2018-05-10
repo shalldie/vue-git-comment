@@ -1,0 +1,16 @@
+.git-comment {
+    color: #333;
+
+    .git-comment-header {
+        // font-size:0;
+        height: 30px;
+        line-height: 30px;
+        .gc-like-item{
+
+            svg{
+                width:30px;
+                height:30px;
+            }
+        }
+    }
+}
