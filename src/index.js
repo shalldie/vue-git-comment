@@ -3,7 +3,10 @@
 const config = {
     el: document.getElementById('root'),
     client_id: '3a657823527f57a63864',
-    client_secret: '80714a6e5a35b36043a5dfbd15d43795e95aaa9b'
+    client_secret: '80714a6e5a35b36043a5dfbd15d43795e95aaa9b',
+    owner: 'shalldie',
+    repo: 'gitment-store',
+    key: 'gitment'
 };
 
 
@@ -27,7 +30,7 @@ if (!gitComment.state.ifLogin) {
     // gitComment.login();
 }
 else {
-    gitComment.getUserInfo();
+    // gitComment.getUserInfo();
 }
 
 window.gitComment = gitComment;

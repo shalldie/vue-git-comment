@@ -14,6 +14,12 @@ export default {
 
     access_token: '',
 
+    owner: '',
+
+    repo: '',
+
+    key: '',
+
     /**
      * 是否登录
      */
@@ -21,5 +27,13 @@ export default {
 
     userInfo: {
         avatar_url: ''
+    },
+
+    update(sender) {
+        for (let key in sender) {
+            if (sender.hasOwnProperty(key)) {
+                this[key] = sender[key];
+            }
+        }
     }
 };

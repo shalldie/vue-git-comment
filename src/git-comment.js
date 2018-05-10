@@ -48,6 +48,8 @@ class GitComment {
         this._updateToken(localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN));
         // 如果重定向回来，就去获取token并存下来
         this._checkBack();
+
+        this._getIssueInfo();
     }
 
     /**
@@ -90,14 +92,25 @@ class GitComment {
      */
     _updateToken(token) {
         if (token && token.length) {
-            state.ifLogin = true;
-            state.access_token = token;
+            state.update({
+                ifLogin: true,
+                access_token: token
+            });
         }
         else {
-            state.ifLogin = false;
-            state.access_token = '';
+            state.update({
+                ifLogin: false,
+                access_token: ''
+            });
         }
         window.localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, state.access_token);
+    }
+
+    _getIssueInfo() {
+        github.getFirstIssue(state.owner, state.repo, state.key)
+            .then(result => {
+                console.log(result);
+            });
     }
 
     //#endregion
@@ -119,8 +132,10 @@ class GitComment {
      * @memberof GitComment
      */
     logOut() {
-        state.ifLogin = false;
-        state.access_token = '';
+        state.update({
+            ifLogin: false,
+            access_token: ''
+        });
         window.localStorage.removeItem(GIT_COMMENT_ACCESS_STOKEN);
     }
 
