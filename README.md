@@ -1,2 +1,2 @@
 # git-comment
-A comment component base on github's issues.
+A vue's comment component base on github's issues.

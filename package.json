@@ -1,7 +1,7 @@
 {
   "name": "vue-git-comment",
   "version": "0.0.1",
-  "description": "A comment component base on github's issues.",
+  "description": "A vue's comment component base on github's issues.",
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
