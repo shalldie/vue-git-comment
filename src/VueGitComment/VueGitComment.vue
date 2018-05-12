@@ -1,11 +1,18 @@
 <template>
     <div class="vue-git-comment">
-        This is vue-git-comment.
+        <CommentHeader />
     </div>
 </template>
 
 <script>
+import CommentHeader from '../components/CommentHeader';
+
 export default {
+
+    components: {
+        CommentHeader
+    },
+
     created() {
         new Promise(res => {
             setTimeout(() => {
@@ -17,5 +24,10 @@ export default {
 </script>
 
 <style lang="scss">
+@import './github-markdown.css';
 
+.vue-git-comment {
+    color: #333;
+    font-family: sans-serif;
+}
 </style>

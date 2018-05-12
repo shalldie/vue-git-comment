@@ -1,6 +1,6 @@
 import http from './http';
 import { getQuery, appendQuery } from "./utils";
-import state from '../state';
+import store from './store';
 
 /**
  * 找到第一个符合的issue
@@ -59,8 +59,8 @@ export function getCurrentIssue(owner, repo, labels) {
 export function getToken(client_id, client_secret, code) {
     return http
         .post('https://github.com/login/oauth/access_token', {
-            client_id: state.client_id,
-            client_secret: state.client_secret,
+            client_id: store.client_id,
+            client_secret: store.client_secret,
             code
         }, true)
         .then(body => getQuery(body, 'access_token'));
