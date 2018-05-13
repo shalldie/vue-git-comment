@@ -5,6 +5,10 @@
             <div class="ce-header has-border">
                 <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
                 <div @click="showArea=false" :class="{active:!showArea}" class="ce-tab-item">Preview</div>
+                <div class="login-link-btn">
+                    <a @click="login" href="javascript:void(0)">Login</a>
+                    with Github
+                </div>
             </div>
             <div class="ce-body">
                 <textarea v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin" class="ce-textarea" placeholder="Leave a comment."></textarea>
@@ -24,8 +28,9 @@
 
 <script>
 import store from '../lib/store';
-import * as  github from '../lib/github';
-import { githubIcon } from "../lib/icons";
+import * as github from '../lib/github';
+import { githubIcon } from '../lib/icons';
+import gitComment from '../lib/gitComment';
 
 export default {
 
@@ -55,6 +60,10 @@ export default {
             if (this.cacheList.length > 10) {
                 this.cacheList.shift();
             }
+        },
+
+        login() {
+            gitComment.login();
         }
     },
 
@@ -119,7 +128,8 @@ export default {
                 font-size: 0;
                 border: 1px solid #cfd8dc;
 
-                .ce-tab-item {
+                .ce-tab-item,
+                .login-link-btn {
                     height: 40px;
                     line-height: 40px;
                     display: inline-block;
@@ -134,6 +144,14 @@ export default {
                     &.active {
                         border-color: #cfd8dc;
                         border-bottom-color: #fff;
+                    }
+                }
+
+                .login-link-btn {
+                    float: right;
+                    cursor: default;
+                    a {
+                        text-decoration: none;
                     }
                 }
             }

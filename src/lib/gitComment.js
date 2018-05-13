@@ -1,6 +1,6 @@
 import store from './store';
-import { appendQuery, getQuery } from "./lib/utils";
-import * as github from './lib/github';
+import { appendQuery, getQuery } from "./utils";
+import * as github from './github';
 
 /**
  * https://github.com/shalldie/git-comment
@@ -96,7 +96,8 @@ class GitComment {
     _getIssueInfo() {
         github.getFirstIssue(store.owner, store.repo, store.key)
             .then(result => {
-                console.log(result);
+                // console.log(result);
+                store.commentsNum = result.comments;
             });
     }
 

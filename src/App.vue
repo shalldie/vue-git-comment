@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <VueGitComment />
+        <VueGitComment :options="options" />
     </div>
 </template>
 
@@ -11,6 +11,18 @@ export default {
     name: 'App',
     components: {
         VueGitComment
+    },
+
+    data() {
+        return {
+            options: {
+                client_id: '3a657823527f57a63864',
+                client_secret: '80714a6e5a35b36043a5dfbd15d43795e95aaa9b',
+                owner: 'shalldie',
+                repo: 'gitment-store',
+                key: 'gitment'
+            }
+        };
     }
 }
 </script>

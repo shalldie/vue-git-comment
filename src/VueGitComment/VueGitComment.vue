@@ -12,8 +12,15 @@ import CommentHeader from '../components/CommentHeader';
 import CommentBody from '../components/CommentBody';
 import CommentPagination from '../components/CommentPagination';
 import CommentEditor from '../components/CommentEditor';
+import gitComment from '../lib/gitComment';
 
 export default {
+
+    props: {
+        options: {
+            required: true
+        }
+    },
 
     components: {
         CommentHeader,
@@ -22,12 +29,8 @@ export default {
         CommentEditor
     },
 
-    created() {
-        new Promise(res => {
-            setTimeout(() => {
-                res(10);
-            }, 10);
-        }).then(n => console.log(n));
+    mounted() {
+        gitComment.config(this.options);
     }
 };
 </script>
@@ -63,6 +66,9 @@ export default {
             border-right-color: #fff;
             top: 7px;
         }
+    }
+    a {
+        color: #2196f3;
     }
 }
 </style>
