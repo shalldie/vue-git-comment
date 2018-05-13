@@ -14,6 +14,10 @@
                 <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">Styling with Markdown is supported</a>
                 <button :disabled="!store.ifLogin" class="ce-commit-btn">Comment</button>
             </div>
+            <div class="ce-power-row">
+                Powered by
+                <a target="_blank" href="https://github.com/shalldie/vue-git-comment">vue-git-comment</a>
+            </div>
         </div>
     </div>
 </template>
@@ -134,6 +138,7 @@ export default {
 
             .ce-body {
                 .ce-textarea {
+                    display: block;
                     outline: none;
                     width: 100%;
                     min-height: 150px;
@@ -180,6 +185,19 @@ export default {
                     border: none;
                     &:hover {
                         background-color: #00acc1;
+                    }
+                }
+            }
+
+            .ce-power-row {
+                margin-top: 10px;
+                text-align: right;
+                font-size: 12px;
+                a {
+                    color: #2196f3;
+                    text-decoration: none;
+                    &:hover {
+                        text-decoration: underline;
                     }
                 }
             }
