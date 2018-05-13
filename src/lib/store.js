@@ -33,7 +33,20 @@ export default {
      */
     likedNum: 32,
 
+    /**
+     * 评论数量
+     */
     commentsNum: 23,
+
+    /**
+     * 评论列表
+     */
+    commentList: [],
+
+    /**
+     * true-由旧到新 false-由新到旧
+     */
+    sortedAsc: false,
 
     update(sender) {
         for (let key in sender) {

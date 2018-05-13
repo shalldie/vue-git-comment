@@ -1,16 +1,25 @@
 <template>
     <div class="vue-git-comment">
         <CommentHeader />
+        <CommentBody />
+        <CommentPagination />
+        <CommentFooter />
     </div>
 </template>
 
 <script>
 import CommentHeader from '../components/CommentHeader';
+import CommentBody from '../components/CommentBody';
+import CommentPagination from '../components/CommentPagination';
+import CommentFooter from '../components/CommentFooter';
 
 export default {
 
     components: {
-        CommentHeader
+        CommentHeader,
+        CommentBody,
+        CommentPagination,
+        CommentFooter
     },
 
     created() {

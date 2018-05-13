@@ -1,7 +1,7 @@
 <template>
     <div class="comment-header">
-        <span class="like-item">
-            <span class="heart-icon" v-html="heartIcon"></span>
+        <span @click="toggleLike" class="like-item">
+            <span :class="{liked:liked}" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
                 <strong>{{store.likedNum}}</strong> Liked
             </span>
@@ -11,6 +11,9 @@
             <strong>{{store.commentsNum}}</strong> Comments
         </span>
         <a href="javascript:void(0)" class="issue-link">Issue Page</a>
+        <strong @click="changeSort(true)" :class="{active:store.sortedAsc}" class="sort-item" title="sort by old">ASC</strong>
+        <strong class="sort-item">•</strong>
+        <strong @click="changeSort(false)" :class="{active:!store.sortedAsc}" class="sort-item" title="sort by new">DESC</strong>
     </div>
 </template>
 
@@ -23,46 +26,61 @@ export default {
     data() {
         return {
             heartIcon,
-            store
+            store,
+            liked: true
         };
+    },
+
+    methods: {
+        toggleLike() {
+            this.liked = !this.liked;
+        },
+        changeSort(ifAsc) {
+            this.store.sortedAsc = ifAsc;
+        }
     }
 
 };
 </script>
 
 <style lang="scss">
-.comment-header {
-    height: 30px;
-    font-size: 0;
-    .like-item {
-        display: inline-block;
+.vue-git-comment {
+    .comment-header {
         height: 30px;
-        cursor: pointer;
-        .heart-icon {
+        font-size: 0;
+        .like-item {
             display: inline-block;
-            vertical-align: middle;
-            svg {
-                width: 30px;
-                height: 30px;
+            height: 30px;
+            cursor: pointer;
+            .heart-icon {
+                display: inline-block;
+                vertical-align: middle;
+                svg {
+                    width: 30px;
+                    height: 30px;
+                }
+                &.liked svg {
+                    fill: #f00;
+                }
             }
         }
-    }
-    .heart-txt,
-    .comment-num,
-    .issue-link {
-        display: inline-block;
-        vertical-align: middle;
-        font-size: 14px;
-        margin-left: 5px;
-    }
+        .heart-txt,
+        .comment-num,
+        .sort-item {
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 14px;
+            margin-left: 5px;
+        }
 
-    .issue-link {
-        float: right;
-        color: #666;
-        text-decoration: none;
-        line-height: 30px;
-        &:hover {
-            text-decoration: underline;
+        .sort-item {
+            float: right;
+            color: #666;
+            line-height: 30px;
+            cursor: pointer;
+            &.active {
+                color: #f00;
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 <template>
-
+    <div class="comment-pagination">
+        this is pagination.
+    </div>
 </template>
 
 <script>
