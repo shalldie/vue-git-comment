@@ -46,5 +46,23 @@ export default {
     :disabled {
         cursor: not-allowed;
     }
+
+    .has-border {
+        &::before,
+        &::after {
+            content: '';
+            position: absolute;
+            border: 8px solid transparent;
+            border-right-color: #cfd8dc;
+            right: 100%;
+            top: 6px;
+        }
+
+        &::after {
+            border-width: 7px;
+            border-right-color: #fff;
+            top: 7px;
+        }
+    }
 }
 </style>

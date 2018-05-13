@@ -2,7 +2,7 @@
     <div class="comment-editor">
         <span class="user-avatar" v-if="!store.ifLogin" href="javascript:void(0)" v-html="githubIcon"></span>
         <div class="comment-editor-main">
-            <div class="ce-header">
+            <div class="ce-header has-border">
                 <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
                 <div @click="showArea=false" :class="{active:!showArea}" class="ce-tab-item">Preview</div>
             </div>
@@ -92,6 +92,7 @@ export default {
     .comment-editor {
         position: relative;
         margin-top: 15px;
+
         .user-avatar,
         .user-avatar svg {
             width: 44px;
@@ -113,6 +114,7 @@ export default {
             margin-left: 60px;
 
             .ce-header {
+                position: relative;
                 height: 40px;
                 font-size: 0;
                 border: 1px solid #cfd8dc;
