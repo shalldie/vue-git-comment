@@ -3,7 +3,7 @@
         <CommentHeader />
         <CommentBody />
         <CommentPagination />
-        <CommentFooter />
+        <CommentEditor />
     </div>
 </template>
 
@@ -11,7 +11,7 @@
 import CommentHeader from '../components/CommentHeader';
 import CommentBody from '../components/CommentBody';
 import CommentPagination from '../components/CommentPagination';
-import CommentFooter from '../components/CommentFooter';
+import CommentEditor from '../components/CommentEditor';
 
 export default {
 
@@ -19,7 +19,7 @@ export default {
         CommentHeader,
         CommentBody,
         CommentPagination,
-        CommentFooter
+        CommentEditor
     },
 
     created() {
@@ -38,5 +38,13 @@ export default {
 .vue-git-comment {
     color: #333;
     font-family: sans-serif;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    :disabled {
+        cursor: not-allowed;
+    }
 }
 </style>

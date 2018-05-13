@@ -20,6 +20,11 @@ export default {
     //#endregion
 
     /**
+     * 正在初始化
+     */
+    loading: true,
+
+    /**
      * 是否登录
      */
     ifLogin: false,

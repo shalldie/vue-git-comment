@@ -86,3 +86,10 @@ export function toAuthorize(client_id) {
 export function getAuthUser() {
     return http.get('/user').then(body => JSON.parse(body));
 }
+
+export function getMarkDown(content) {
+    return http.post('/markdown', {
+        mode: 'gfm',
+        text: content
+    });
+}

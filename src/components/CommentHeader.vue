@@ -60,7 +60,7 @@ export default {
                     height: 30px;
                 }
                 &.liked svg {
-                    fill: #f00;
+                    fill: #f44336;
                 }
             }
         }
@@ -79,7 +79,7 @@ export default {
             line-height: 30px;
             cursor: pointer;
             &.active {
-                color: #f00;
+                color: #f44336;
             }
         }
     }
