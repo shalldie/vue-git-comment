@@ -30,6 +30,7 @@ export default {
     ifLogin: false,
 
     userInfo: {
+        name: '',
         avatar_url: ''
     },
 

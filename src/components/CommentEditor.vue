@@ -5,10 +5,11 @@
             <div class="ce-header has-border">
                 <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
                 <div @click="showArea=false" :class="{active:!showArea}" class="ce-tab-item">Preview</div>
-                <div class="login-link-btn">
+                <div v-if="!store.ifLogin" class="login-link-btn">
                     <a @click="login" href="javascript:void(0)">Login</a>
                     with Github
                 </div>
+                <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
                 <textarea v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin" class="ce-textarea" placeholder="Leave a comment."></textarea>
@@ -64,6 +65,10 @@ export default {
 
         login() {
             gitComment.login();
+        },
+
+        logOut() {
+            gitComment.logOut();
         }
     },
 
@@ -152,6 +157,17 @@ export default {
                     cursor: default;
                     a {
                         text-decoration: none;
+                    }
+                }
+
+                .logout-link {
+                    float: right;
+                    line-height: 40px;
+                    font-size: 14px;
+                    margin-right: 12px;
+                    cursor: pointer;
+                    &:hover {
+                        color: #2196f3;
                     }
                 }
             }

@@ -32,17 +32,27 @@ class GitComment {
      * @memberof GitComment
      */
     init() {
-        this._updateToken(localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN));
-        // 如果重定向回来，就去获取token并存下来
-        this._checkBack();
 
-        this._getIssueInfo();
+        // 如果重定向回来，就去获取token并存下来
+        let ifBack = this._checkBack();
+        if (ifBack) {
+            return;
+        }
+
+        let token = localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN); // webStorage 里面存储的token
+        if (token) {  // 有token就去校验并拉取数据
+            store.access_token = token;
+            this.getUserInfo();
+        }
+
+        // this._getIssueInfo();
     }
 
     /**
      * 检查是否是重定向回来
      *
      * @memberof GitComment
+     * @returns {boolean}
      */
     _checkBack() {
         const search = window.location.search;
@@ -50,7 +60,9 @@ class GitComment {
         if (/(?=\S*code=\S*)(?=\S*state=\S*)/.test(search)) {
             let code = getQuery(window.location.search, 'code');
             this._getToken(code);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -65,32 +77,12 @@ class GitComment {
 
         github.getToken(store.client_id, store.client_secret, code)
             .then(token => {
-                this._updateToken(token);
+                store.access_token = token;
+                localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, token);
                 window.history.replaceState(null, null, replaceUrl);
             })
+            .then(() => this.getUserInfo())
             .catch(err => console.log(err));
-    }
-
-    /**
-     * 更新token和状态
-     *
-     * @param {string} token
-     * @memberof GitComment
-     */
-    _updateToken(token) {
-        if (token && token.length) {
-            store.update({
-                ifLogin: true,
-                access_token: token
-            });
-        }
-        else {
-            store.update({
-                ifLogin: false,
-                access_token: ''
-            });
-        }
-        window.localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, store.access_token);
     }
 
     _getIssueInfo() {
@@ -128,11 +120,14 @@ class GitComment {
     }
 
     getUserInfo() {
-        github.getAuthUser().then(body => console.log(body))
-            .catch(err => {  // token失效，未登录状态
-                console.log(err);
-                this.logOut();
-            });
+        github.getAuthUser().then(body => {
+            store.ifLogin = true;
+            store.userInfo.name = body.login;
+            store.userInfo.avatar_url = body.avatar_url;
+        }).catch(err => {  // token失效，未登录状态
+            console.log(err);
+            this.logOut();
+        });
     }
 
     //#endregion
