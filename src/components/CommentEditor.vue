@@ -1,6 +1,8 @@
 <template>
     <div class="comment-editor">
-        <span class="user-avatar" v-if="!store.ifLogin" href="javascript:void(0)" v-html="githubIcon"></span>
+        <span class="user-avatar" v-if="!store.ifLogin&&!store.userInfo.loading" href="javascript:void(0)" v-html="githubIcon"></span>
+        <span class="user-avatar user-avatar-loading" v-else-if="!store.ifLogin&&store.userInfo.loading" v-html="spinnerIcon"></span>
+        <img class="user-avatar" v-else :src="store.userInfo.avatar_url">
         <div class="comment-editor-main">
             <div class="ce-header has-border">
                 <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
@@ -30,7 +32,7 @@
 <script>
 import store from '../lib/store';
 import * as github from '../lib/github';
-import { githubIcon } from '../lib/icons';
+import { githubIcon, spinnerIcon } from '../lib/icons';
 import gitComment from '../lib/gitComment';
 
 export default {
@@ -39,6 +41,7 @@ export default {
         return {
             store,
             githubIcon,
+            spinnerIcon,
             showArea: true,
             areaContent: '',
             markdownContent: 'Nothing to preview',
@@ -102,6 +105,14 @@ export default {
 </script>
 
 <style lang="scss">
+@keyframes vue-git-comment-rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
 .vue-git-comment {
     .comment-editor {
         position: relative;
@@ -116,12 +127,21 @@ export default {
             cursor: pointer;
         }
 
-        .user-avatar {
+        .user-avatar,
+        .user-avatar-loading {
             position: absolute;
             left: 0;
             top: 0;
             display: inline-block;
             background: #333;
+        }
+
+        .user-avatar-loading {
+            background: none;
+            animation: vue-git-comment-rotate 2s linear infinite;
+            svg {
+                fill: #333;
+            }
         }
 
         .comment-editor-main {
@@ -165,6 +185,7 @@ export default {
                     line-height: 40px;
                     font-size: 14px;
                     margin-right: 12px;
+                    margin-top: -1px;
                     cursor: pointer;
                     &:hover {
                         color: #2196f3;
@@ -219,6 +240,7 @@ export default {
                     background-color: #00bcd4;
                     outline: none;
                     border: none;
+                    cursor: pointer;
                     &:hover {
                         background-color: #00acc1;
                     }

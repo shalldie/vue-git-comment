@@ -74,7 +74,7 @@ class GitComment {
     _getToken(code) {
         let replaceUrl = getQuery(window.location.search, 'state');
         replaceUrl = decodeURIComponent(replaceUrl);
-
+        store.userInfo.loading = true;
         github.getToken(store.client_id, store.client_secret, code)
             .then(token => {
                 store.access_token = token;
@@ -120,10 +120,14 @@ class GitComment {
     }
 
     getUserInfo() {
+        // store.userInfo.loading = true;
         github.getAuthUser().then(body => {
             store.ifLogin = true;
-            store.userInfo.name = body.login;
-            store.userInfo.avatar_url = body.avatar_url;
+            store.userInfo = {
+                loading: false,
+                name: body.login,
+                avatar_url: body.avatar_url
+            };
         }).catch(err => {  // token失效，未登录状态
             console.log(err);
             this.logOut();

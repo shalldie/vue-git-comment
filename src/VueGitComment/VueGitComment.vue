@@ -47,7 +47,7 @@ export default {
     }
 
     :disabled {
-        cursor: not-allowed;
+        cursor: not-allowed !important;
     }
 
     .has-border {
