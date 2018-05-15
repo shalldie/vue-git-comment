@@ -83,13 +83,42 @@ export function toAuthorize(client_id) {
     window.location.href = url;
 }
 
+/**
+ * 获取用户信息
+ *
+ * @export
+ * @returns {Promise<any>}
+ */
 export function getAuthUser() {
     return http.get('/user').then(body => JSON.parse(body));
 }
 
+/**
+ * 获取markdown信息
+ *
+ * @export
+ * @param {string} content
+ * @returns {Promise<string>}
+ */
 export function getMarkDown(content) {
     return http.post('/markdown', {
         mode: 'gfm',
         text: content
     });
+}
+
+/**
+ * 获取评论信息
+ *
+ * @export
+ * @param {string} owner
+ * @param {string} repo
+ * @param {number} number
+ * @returns
+ */
+export function getComments(owner, repo, number) {
+    return http.get(`/repos/${owner}/${repo}/issues/${number}/comments`, {
+        page: store.comments.page,
+        per_page: store.comments.per_page
+    }).then(body => JSON.parse(body));
 }

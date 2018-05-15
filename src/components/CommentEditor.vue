@@ -2,7 +2,7 @@
     <div class="comment-editor">
         <span class="user-avatar" v-if="!store.ifLogin&&!store.userInfo.loading" href="javascript:void(0)" v-html="githubIcon"></span>
         <span class="user-avatar user-avatar-loading" v-else-if="!store.ifLogin&&store.userInfo.loading" v-html="spinnerIcon"></span>
-        <img class="user-avatar" v-else :src="store.userInfo.avatar_url">
+        <img class="user-avatar user-avatar-img" v-else :src="store.userInfo.avatar_url">
         <div class="comment-editor-main">
             <div class="ce-header has-border">
                 <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
@@ -34,6 +34,7 @@ import store from '../lib/store';
 import * as github from '../lib/github';
 import { githubIcon, spinnerIcon } from '../lib/icons';
 import gitComment from '../lib/gitComment';
+import * as _ from '../lib/utils';
 
 export default {
 
@@ -94,7 +95,7 @@ export default {
             this.markdownContent = 'Loading preview ...';
             github.getMarkDown(this.areaContent)
                 .then(body => {
-                    body = body.replace(/(<a )/g, '$1target="_blank" ');
+                    body = _.addTargetBlank(body);
                     this.markdownContent = body;
                     this.addCache(this.areaContent, body);
                 });
@@ -142,6 +143,10 @@ export default {
             svg {
                 fill: #333;
             }
+        }
+
+        .user-avatar-img {
+            background: none;
         }
 
         .comment-editor-main {

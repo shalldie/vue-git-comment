@@ -47,3 +47,41 @@ export function getQuery(url, key) {
     }
     return '';
 }
+
+/**
+ * 给html中的a标签加个 target="_blank"
+ *
+ * @export
+ * @param {string} content
+ * @returns
+ */
+export function addTargetBlank(content) {
+    return content.replace(/(<a )/g, '$1target="_blank" ');
+}
+
+/**
+ * 时间格式化
+ *
+ * @export
+ * @param {Date} date
+ * @param {string} format
+ * @returns
+ */
+export function dateFormat(date, format) {
+    const dict = {
+        "y+": date.getFullYear(),
+        "M+": date.getMonth() + 1,
+        "d+": date.getDate(),
+        "H+": date.getHours(),
+        "h+": date.getHours() - 12,
+        "m+": date.getMinutes(),
+        "s+": date.getSeconds()
+    };
+    for (let k in dict) {
+        let reg = new RegExp(k, "g");
+        format = format.replace(reg, function (g0) {
+            return ("000000" + dict[k]).slice(-g0.length);
+        });
+    }
+    return format;
+}

@@ -1,6 +1,7 @@
 import store from './store';
 import { appendQuery, getQuery } from "./utils";
 import * as github from './github';
+import * as _ from './utils';
 
 /**
  * https://github.com/shalldie/git-comment
@@ -20,6 +21,7 @@ class GitComment {
      */
     config(options) {
         // const { client_id, client_secret } = options;
+        store.reset();
         Object.assign(store, options);
         this.init();
     }
@@ -33,19 +35,56 @@ class GitComment {
      */
     init() {
 
-        // 如果重定向回来，就去获取token并存下来
-        let ifBack = this._checkBack();
-        if (ifBack) {
+        if (this._backStep()) {
             return;
         }
 
-        let token = localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN); // webStorage 里面存储的token
-        if (token) {  // 有token就去校验并拉取数据
-            store.access_token = token;
-            this.getUserInfo();
+        if (this._tokenStep()) {
+            return;
         }
 
-        // this._getIssueInfo();
+        this._normalStep();
+    }
+
+    /**
+     * 重定向后回来的步骤
+     */
+    _backStep() {
+        let code = this._checkBack();
+        if (!code) {
+            return false;
+        }
+        console.log('backstep');
+
+        // 在获取token后，加载数据，获取用户信息
+        this._getToken(code)
+            .then(() => {
+                this.getUserInfo();
+                return this._getIssueInfo();
+            })
+            .then(() => this.getCurrentPage());
+        return true;
+    }
+
+    _tokenStep() {
+        let token = localStorage.getItem(GIT_COMMENT_ACCESS_STOKEN); // webStorage 里面存储的token
+        if (!token) {
+            return false;
+        }
+        console.log('tokenstep');
+        store.access_token = token;
+
+        // 如果存在历史token，先验证，再加载数据
+        this.getUserInfo()
+            .then(() => this._getIssueInfo())
+            .then(() => this.getCurrentPage());
+        return true;
+    }
+
+    _normalStep() {
+        console.log('normalstep');
+        this._getIssueInfo()
+            .then(() => this.getCurrentPage());
     }
 
     /**
@@ -59,8 +98,8 @@ class GitComment {
         // 如果是跳转回来的页面，即包含 code 和 state
         if (/(?=\S*code=\S*)(?=\S*state=\S*)/.test(search)) {
             let code = getQuery(window.location.search, 'code');
-            this._getToken(code);
-            return true;
+            // this._getToken(code);
+            return code;
         }
         return false;
     }
@@ -75,21 +114,27 @@ class GitComment {
         let replaceUrl = getQuery(window.location.search, 'state');
         replaceUrl = decodeURIComponent(replaceUrl);
         store.userInfo.loading = true;
-        github.getToken(store.client_id, store.client_secret, code)
+        return github
+            .getToken(store.client_id, store.client_secret, code)
             .then(token => {
                 store.access_token = token;
                 localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, token);
                 window.history.replaceState(null, null, replaceUrl);
-            })
-            .then(() => this.getUserInfo())
-            .catch(err => console.log(err));
+            });
     }
 
     _getIssueInfo() {
-        github.getFirstIssue(store.owner, store.repo, store.key)
+        return github
+            .getFirstIssue(store.owner, store.repo, store.key)
             .then(result => {
-                // console.log(result);
-                store.commentsNum = result.comments;
+                // 没有初始化issue
+                if (!result) {
+                    store.issue.created = false;
+                    return;
+                }
+                store.comments.count = result.comments;
+                store.issue.number = result.number;
+                store.issue.likedCount = result.reactions.heart;
             });
     }
 
@@ -121,7 +166,7 @@ class GitComment {
 
     getUserInfo() {
         // store.userInfo.loading = true;
-        github.getAuthUser().then(body => {
+        return github.getAuthUser().then(body => {
             store.ifLogin = true;
             store.userInfo = {
                 loading: false,
@@ -132,6 +177,28 @@ class GitComment {
             console.log(err);
             this.logOut();
         });
+    }
+
+    getCurrentPage() {
+        return github.getComments(store.owner, store.repo, store.issue.number)
+            .then(list => {
+                list = list.map((item, index) => {
+
+                    return {
+                        id: item.id,
+                        body: item.body_html,
+                        created_at: _.dateFormat(new Date(item.created_at), 'yyyy/MM/dd HH:mm:ss'),
+                        heart: item.reactions.heart,
+                        hasHeart: false,
+                        user: {
+                            name: item.user.login,
+                            avatar_url: item.user.avatar_url,
+                            link: item.user.html_url
+                        }
+                    };
+                });
+                store.comments.list = list;
+            });
     }
 
     //#endregion

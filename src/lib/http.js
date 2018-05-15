@@ -22,10 +22,13 @@ function ajax(method, url, data = {}, proxy = false) {
 
     const dfd = new Deferred();
     const xh = new XMLHttpRequest();
-    xh.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            dfd.resolve(this.responseText);
+
+    xh.onload = function () {
+        if (this.status != 200) {
+            dfd.reject(this.responseText);
+            return;
         }
+        dfd.resolve(this.responseText);
     };
     xh.onerror = function (ex) {
         dfd.reject(ex.message);
@@ -40,7 +43,7 @@ function ajax(method, url, data = {}, proxy = false) {
     }
 
     xh.open(method, url, true);
-    // xh.setRequestHeader('Accept', 'application/vnd.github.symmetra-preview+json');
+    xh.setRequestHeader('Accept', '*/*,application/vnd.github.squirrel-girl-preview,application/vnd.github.html+json');
     if (store.access_token) {
         xh.setRequestHeader('Authorization', `token ${store.access_token}`);
     }

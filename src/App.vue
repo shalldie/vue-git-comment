@@ -20,7 +20,7 @@ export default {
                 client_secret: '80714a6e5a35b36043a5dfbd15d43795e95aaa9b',
                 owner: 'shalldie',
                 repo: 'gitment-store',
-                key: 'gitment'
+                key: '/message'
             }
         };
     }
@@ -33,7 +33,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #333;
-    width: 600px;
+    width: 700px;
     margin: 50px auto;
     box-sizing: border-box;
     /* border: 1px solid #ddd; */

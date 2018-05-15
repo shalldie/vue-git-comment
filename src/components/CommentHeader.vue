@@ -3,17 +3,17 @@
         <span @click="toggleLike" class="like-item">
             <span :class="{liked:liked}" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
-                <strong>{{store.likedNum}}</strong> Liked
+                <strong>{{store.issue.likedCount}}</strong> Liked
             </span>
         </span>
         <span class="comment-num">
             •
-            <strong>{{store.commentsNum}}</strong> Comments
+            <strong>{{store.comments.count}}</strong> Comments
         </span>
         <a href="javascript:void(0)" class="issue-link">Issue Page</a>
-        <strong @click="changeSort(true)" :class="{active:store.sortedAsc}" class="sort-item" title="sort by old">ASC</strong>
-        <strong class="sort-item">•</strong>
-        <strong @click="changeSort(false)" :class="{active:!store.sortedAsc}" class="sort-item" title="sort by new">DESC</strong>
+        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item" title="sort by old">Old</strong>
+        <strong class="sort-item" style="cursor:default;">•</strong>
+        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc}" class="sort-item" title="sort by new">New</strong>
     </div>
 </template>
 
@@ -36,7 +36,7 @@ export default {
             this.liked = !this.liked;
         },
         changeSort(ifAsc) {
-            this.store.sortedAsc = ifAsc;
+            this.store.comments.sortedAsc = ifAsc;
         }
     }
 
@@ -51,6 +51,7 @@ export default {
         .like-item {
             display: inline-block;
             height: 30px;
+            margin-left: -5px;
             cursor: pointer;
             .heart-icon {
                 display: inline-block;
