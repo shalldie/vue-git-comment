@@ -11,7 +11,7 @@
                 <img :src="item.user.avatar_url" class="user-avatar">
                 <div class="comment-item-main">
                     <div class="cim-header">
-                        <a class="cim-name" :href="item.user.link">{{item.user.name}}</a>
+                        <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
                         <span class="cim-time">commented on {{item.created_at}}</span>
                         <span class="cim-heart-icon" v-html="heartIcon"></span>
                     </div>
@@ -93,9 +93,6 @@ export default {
                                 height: 20px;
                             }
                         }
-                    }
-
-                    .cim-body {
                     }
                 }
             }
