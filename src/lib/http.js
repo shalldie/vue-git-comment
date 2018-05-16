@@ -25,7 +25,10 @@ function ajax(method, url, data = {}, proxy = false) {
 
     xh.onload = function () {
         if (this.status != 200) {
-            dfd.reject(this.responseText);
+            dfd.reject({
+                status: this.status,
+                message: this.responseText
+            });
             return;
         }
         dfd.resolve(this.responseText);

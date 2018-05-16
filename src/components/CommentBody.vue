@@ -1,8 +1,9 @@
 <template>
     <div class="comment-body">
-        <div v-if="!store.issue.created&&store.owner===store.userInfo.name">
+        <div v-if="creating">Be creating...</div>
+        <div v-else-if="!store.issue.created&&store.owner===store.userInfo.name">
             Seems new,
-            <a href="javascript:void(0)">Click</a>
+            <a @click="createIssue" href="javascript:void(0)">Click</a>
             to create an issue.
         </div>
         <div v-else-if="store.comments.loading" class="comment-loading">loading ...</div>
@@ -25,13 +26,26 @@
 <script>
 import store from '../lib/store';
 import { heartIcon } from '../lib/icons';
+import gitComment from '../lib/gitComment';
 
 export default {
     data() {
         return {
             store,
-            heartIcon
+            heartIcon,
+            creating: false
         };
+    },
+
+    methods: {
+        createIssue() {
+            this.creating = true;
+            gitComment.createIssue()
+                .then(() => {
+                    this.creating = false;
+                    gitComment.init()
+                });
+        }
     }
 };
 </script>

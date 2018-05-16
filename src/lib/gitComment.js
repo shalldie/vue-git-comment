@@ -2,6 +2,7 @@ import store from './store';
 import { appendQuery, getQuery } from "./utils";
 import * as github from './github';
 import * as _ from './utils';
+import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
 
 /**
  * https://github.com/shalldie/git-comment
@@ -10,8 +11,6 @@ import * as _ from './utils';
  * @description 一个基于 issue 的评论插件。
  * @author shalldie
  */
-
-const GIT_COMMENT_ACCESS_STOKEN = 'GIT_COMMENT_ACCESS_STOKEN';
 
 class GitComment {
     /**
@@ -62,7 +61,8 @@ class GitComment {
                 this.getUserInfo();
                 return this._getIssueInfo();
             })
-            .then(() => this.getCurrentPage());
+            .then(() => this.getCurrentPage())
+            .catch(err => console.log(err));
         return true;
     }
 
@@ -77,14 +77,16 @@ class GitComment {
         // 如果存在历史token，先验证，再加载数据
         this.getUserInfo()
             .then(() => this._getIssueInfo())
-            .then(() => this.getCurrentPage());
+            .then(() => this.getCurrentPage())
+            .catch(err => console.log(err));
         return true;
     }
 
     _normalStep() {
         console.log('normalstep');
         this._getIssueInfo()
-            .then(() => this.getCurrentPage());
+            .then(() => this.getCurrentPage())
+            .catch(err => console.log(err));
     }
 
     /**
@@ -125,11 +127,12 @@ class GitComment {
 
     _getIssueInfo() {
         return github
-            .getFirstIssue(store.owner, store.repo, store.key)
+            .getFirstIssue(store.owner, store.repo, [store.key, ...ISSUE_LABELS].join(','))
             .then(result => {
                 // 没有初始化issue
                 if (!result) {
                     store.issue.created = false;
+                    throw new Error('issue uninited');
                     return;
                 }
                 store.comments.count = result.comments;
@@ -199,6 +202,16 @@ class GitComment {
                 });
                 store.comments.list = list;
             });
+    }
+
+    createIssue() {
+        return github.createIssue(
+            store.owner,
+            store.repo,
+            [store.key, ...ISSUE_LABELS],
+            store.title || document.title.substr(0, 20),
+            ISSUE_BODY
+        );
     }
 
     //#endregion

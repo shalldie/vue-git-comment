@@ -122,3 +122,24 @@ export function getComments(owner, repo, number) {
         per_page: store.comments.per_page
     }).then(body => JSON.parse(body));
 }
+
+/**
+ * 创建个 issue
+ * 
+ * @export
+ * @param {string} owner 
+ * @param {string} repo 
+ * @param {Array<string>} labels 
+ * @param {string} title 
+ * @param {string} body 
+ * @returns 
+ */
+export function createIssue(owner, repo, labels, title, body) {
+    return http.post(`/repos/${owner}/${repo}/issues`, { labels, title, body })
+        .catch(({ status, message }) => {
+            if (status == 201) {
+                return message;
+            }
+            return null;
+        });
+}
