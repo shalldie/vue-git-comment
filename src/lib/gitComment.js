@@ -117,7 +117,7 @@ class GitComment {
         replaceUrl = decodeURIComponent(replaceUrl);
         store.userInfo.loading = true;
         return github
-            .getToken(store.client_id, store.client_secret, code)
+            .getToken(code)
             .then(token => {
                 store.access_token = token;
                 localStorage.setItem(GIT_COMMENT_ACCESS_STOKEN, token);
@@ -127,7 +127,7 @@ class GitComment {
 
     _getIssueInfo() {
         return github
-            .getFirstIssue(store.owner, store.repo, [store.key, ...ISSUE_LABELS].join(','))
+            .getFirstIssue([store.key, ...ISSUE_LABELS].join(','))
             .then(result => {
                 // 没有初始化issue
                 if (!result) {
@@ -135,6 +135,7 @@ class GitComment {
                     throw new Error('issue uninited');
                     return;
                 }
+                store.issue.created = true;
                 store.comments.count = result.comments;
                 store.issue.number = result.number;
                 store.issue.likedCount = result.reactions.heart;
@@ -162,7 +163,12 @@ class GitComment {
     logOut() {
         store.update({
             ifLogin: false,
-            access_token: ''
+            access_token: '',
+            userInfo: {
+                loading: false,
+                name: '',
+                avatar_url: ''
+            }
         });
         window.localStorage.removeItem(GIT_COMMENT_ACCESS_STOKEN);
     }
@@ -183,7 +189,7 @@ class GitComment {
     }
 
     getCurrentPage() {
-        return github.getComments(store.owner, store.repo, store.issue.number)
+        return github.getComments()
             .then(list => {
                 list = list.map((item, index) => {
 

@@ -7,7 +7,7 @@ export const GIT_COMMENT_ACCESS_STOKEN = 'GIT_COMMENT_ACCESS_STOKEN';
 /**
  * issue 所用label
  */
-export const ISSUE_LABELS = ['vue-git-comments'];
+export const ISSUE_LABELS = ['vue-git-comment'];
 
 /**
  * issue 的body

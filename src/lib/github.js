@@ -6,28 +6,30 @@ import store from './store';
  * 找到第一个符合的issue
  *
  * @export
- * @param {string} owner 仓库所有者
- * @param {string} repo 仓库名称
  * @param {string} labels labels 用逗号分隔
  * @returns {any>}
  */
-export function getFirstIssue(owner, repo, labels) {
+export function getFirstIssue(labels) {
+    const { owner, repo } = store;
     return http.get(`/repos/${owner}/${repo}/issues`, {
         creator: owner,
-        labels
-    }).then(body => JSON.parse(body)[0]);
+        labels,
+        _: Math.random()
+    }).then(body => {
+        // window.ele_issue = JSON.parse(body);
+        return JSON.parse(body)[0];
+    });
 }
 
 /**
  *
  *
  * @export
- * @param {string} owner
- * @param {string} repo
  * @param {number} number
  * @returns
  */
-export function getIssue(owner, repo, number) {
+export function getIssue(number) {
+    const { owner, repo } = store;
     return http.get(`/repos/${owner}/${repo}/issues/${number}`)
         .then(body => JSON.parse(body));
 }
@@ -36,11 +38,10 @@ export function getIssue(owner, repo, number) {
  * 获取当前使用的issue
  *
  * @export
- * @param {string} owner
- * @param {string} repo
  * @param {string} labels
  */
-export function getCurrentIssue(owner, repo, labels) {
+export function getCurrentIssue(labels) {
+    const { owner, repo } = store;
     getFirstIssue(owner, repo, labels)
         .then(issue => {
 
@@ -51,16 +52,15 @@ export function getCurrentIssue(owner, repo, labels) {
  * 获取token
  *
  * @export
- * @param {string} client_id
- * @param {string} client_secret
  * @param {string} code
  * @returns {Promise<string>}
  */
-export function getToken(client_id, client_secret, code) {
+export function getToken(code) {
+    const { client_id, client_secret } = store;
     return http
         .post('https://github.com/login/oauth/access_token', {
-            client_id: store.client_id,
-            client_secret: store.client_secret,
+            client_id,
+            client_secret,
             code
         }, true)
         .then(body => getQuery(body, 'access_token'));
@@ -111,12 +111,10 @@ export function getMarkDown(content) {
  * 获取评论信息
  *
  * @export
- * @param {string} owner
- * @param {string} repo
- * @param {number} number
  * @returns
  */
-export function getComments(owner, repo, number) {
+export function getComments() {
+    const { owner, repo, issue: { number } } = store;
     return http.get(`/repos/${owner}/${repo}/issues/${number}/comments`, {
         page: store.comments.page,
         per_page: store.comments.per_page
@@ -125,14 +123,14 @@ export function getComments(owner, repo, number) {
 
 /**
  * 创建个 issue
- * 
+ *
  * @export
- * @param {string} owner 
- * @param {string} repo 
- * @param {Array<string>} labels 
- * @param {string} title 
- * @param {string} body 
- * @returns 
+ * @param {string} owner
+ * @param {string} repo
+ * @param {Array<string>} labels
+ * @param {string} title
+ * @param {string} body
+ * @returns
  */
 export function createIssue(owner, repo, labels, title, body) {
     return http.post(`/repos/${owner}/${repo}/issues`, { labels, title, body })
@@ -140,6 +138,16 @@ export function createIssue(owner, repo, labels, title, body) {
             if (status == 201) {
                 return message;
             }
-            return null;
+            throw new Error(message);
         });
+}
+
+export function createComment(owner, repo, number, body) {
+    return http.post(`/repos/${owner}/${repo}/issues/${number}/comments`, { body })
+        .catch(({ status, message }) => {
+            if (status == 201) {
+                return message;
+            }
+            throw new Error(message);
+        })
 }

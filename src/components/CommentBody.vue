@@ -43,7 +43,8 @@ export default {
             gitComment.createIssue()
                 .then(() => {
                     this.creating = false;
-                    gitComment.init()
+                    store.issue.created = true;
+                    gitComment.init();
                 });
         }
     }

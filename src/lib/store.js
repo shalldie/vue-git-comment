@@ -89,10 +89,10 @@ const store = {
     },
 
     reset() {
-        Object.assign(store, baseStore);
+        Object.assign(store, JSON.parse(JSON.stringify(baseStore)));
     }
 };
 
-const baseStore = Object.assign({}, store);
+const baseStore = JSON.parse(JSON.stringify(store));
 
 export default store;
