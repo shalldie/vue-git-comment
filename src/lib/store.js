@@ -49,14 +49,9 @@ const store = {
         number: 0,
 
         /**
-         * 是否已经 `喜欢`
+         * `heart` 的id
          */
-        liked: false,
-
-        /**
-         * `喜欢` 的数量
-         */
-        // likedCount: 0,
+        heartId: '',
 
         /**
          * `喜欢` 的人的用户名

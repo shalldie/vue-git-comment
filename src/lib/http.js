@@ -38,7 +38,7 @@ function ajax(method, url, data = {}, proxy = false) {
         dfd.reject(ex.message);
     };
 
-    if (method === 'GET') {
+    if (method === 'GET' || method === 'DELETE') {
         // data._ = Math.random();
         url = appendQuery(url, data);
         data = null;
@@ -69,6 +69,12 @@ export default {
      * @param {boolean} proxy 是否启用代理
      */
     get: (url, data, proxy) => ajax('get', url, data, proxy),
+    /**
+     * 进行 delete 请求
+     * 
+     * @param {string} url 地址
+     */
+    delete: url => ajax('delete', url),
     /**
      * 进行 post 请求
      *

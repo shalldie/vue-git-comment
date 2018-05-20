@@ -148,3 +148,48 @@ export function issueReactions() {
     return http.get(`/repos/${owner}/${repo}/issues/${number}/reactions`)
         .then(body => JSON.parse(body));
 }
+
+/**
+ * 获取comment的点赞信息
+ * 
+ * @export
+ * @param {any} commentId 
+ * @returns 
+ */
+export function commentReactions(commentId) {
+    const { owner, repo } = store;
+    return http.get(`/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`)
+        .then(body => JSON.parse(body));
+}
+
+/**
+ * 给issue点赞
+ * 
+ * @export
+ * @returns 
+ */
+export function heartIssue() {
+    const { owner, repo, issue: { number } } = store;
+    return http.post(`/repos/${owner}/${repo}/issues/${number}/reactions`, {
+        content: 'heart'
+    });
+}
+
+/**
+ * 取消issue的赞
+ * 
+ * @export
+ * @param {string} id heart的id
+ * @returns 
+ */
+export function deleteIssueHeart(heartId) {
+    return http.delete(`/reactions/${heartId}`);
+}
+
+export function heartComment(commentId) {
+
+}
+
+export function deleteCommentHeart(heartId) {
+
+}

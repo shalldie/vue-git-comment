@@ -141,8 +141,23 @@ class GitComment {
         github.issueReactions()
             .then(list => {
                 list = list.filter(n => n.content === 'heart')
-                    .map(n => n.user.login);
+                    .map(n => ({
+                        id: n.id,
+                        name: n.user.login
+                    }));
                 store.issue.likedList = list;
+            });
+    }
+
+    _getCommentReactions(commentId) {
+        return github.commentReactions(commentId)
+            .then(list => {
+                list = list.filter(n => n.content == 'heart')
+                    .map(n => ({
+                        id: n.id,
+                        name: n.user.login
+                    }))
+                return list;
             });
     }
 
@@ -204,12 +219,24 @@ class GitComment {
                         created_at: _.dateFormat(new Date(item.created_at), 'yyyy/MM/dd HH:mm:ss'),
                         heart: item.reactions.heart,
                         hasHeart: false,
+                        likedList: Array(item.reactions.heart),
                         user: {
                             name: item.user.login,
                             avatar_url: item.user.avatar_url,
                             link: item.user.html_url
                         }
                     };
+                });
+                // 有 heart 的时候，去获取具体信息
+                list.forEach(item => {
+                    if (!item.likedList.length) {
+                        return;
+                    }
+                    this._getCommentReactions(item.id)
+                        .then(likedList => {
+                            item.likedList = likedList;
+                            store.comments.list = store.comments.list.slice();
+                        });
                 });
                 store.comments.loading = false;
                 store.comments.list = list;
@@ -233,6 +260,14 @@ class GitComment {
      */
     createComment(body) {
         return github.createComment(body);
+    }
+
+    createIssueHeart() {
+
+    }
+
+    createCommentHeart() {
+
     }
 
     //#endregion
