@@ -3,7 +3,7 @@
         <span @click="toggleLike" class="like-item">
             <span :class="{liked:liked}" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
-                <strong>{{store.issue.likedCount}}</strong> Liked
+                <strong>{{store.issue.likedList.length}}</strong> Liked
             </span>
         </span>
         <span class="comment-num">
@@ -26,9 +26,15 @@ export default {
     data() {
         return {
             heartIcon,
-            store,
-            liked: true
+            store
+            // liked: true
         };
+    },
+
+    computed: {
+        liked() {
+            return ~store.issue.likedList.indexOf(store.userInfo.name);
+        }
     },
 
     methods: {

@@ -4,14 +4,6 @@ import * as github from './github';
 import * as _ from './utils';
 import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
 
-/**
- * https://github.com/shalldie/git-comment
- *
- * @license MIT License
- * @description 一个基于 vue2 + github issue 的评论插件。
- * @author shalldie
- */
-
 class GitComment {
     /**
      * 配置初始化信息
@@ -75,8 +67,8 @@ class GitComment {
         store.access_token = token;
 
         // 如果存在历史token，先验证，再加载数据
-        this.getUserInfo()
-            .then(() => this._getIssueInfo())
+        this.getUserInfo();
+        Promise.resolve().then(() => this._getIssueInfo())
             .then(() => this.getCurrentPage())
             .catch(err => console.log(err));
         return true;
@@ -138,7 +130,19 @@ class GitComment {
                 store.issue.created = true;
                 store.comments.count = result.comments;
                 store.issue.number = result.number;
-                store.issue.likedCount = result.reactions.heart;
+                // store.issue.likedCount = result.reactions.heart;
+
+                store.issue.likedList = Array(result.reactions.heart);
+                this._getIssueReactions();
+            });
+    }
+
+    _getIssueReactions() {
+        github.issueReactions()
+            .then(list => {
+                list = list.filter(n => n.content === 'heart')
+                    .map(n => n.user.login);
+                store.issue.likedList = list;
             });
     }
 
@@ -196,7 +200,7 @@ class GitComment {
 
                     return {
                         id: item.id,
-                        body: item.body_html,
+                        body: _.addTargetBlank(item.body_html),
                         created_at: _.dateFormat(new Date(item.created_at), 'yyyy/MM/dd HH:mm:ss'),
                         heart: item.reactions.heart,
                         hasHeart: false,

@@ -39,7 +39,7 @@ function ajax(method, url, data = {}, proxy = false) {
     };
 
     if (method === 'GET') {
-        data._ = Math.random();
+        // data._ = Math.random();
         url = appendQuery(url, data);
         data = null;
     }

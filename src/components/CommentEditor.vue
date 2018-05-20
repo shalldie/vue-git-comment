@@ -77,6 +77,9 @@ export default {
         },
 
         comment() {
+            if (this.areaContent.trim().length <= 0) {
+                return;
+            }
             this.submitting = true;
             gitComment.createComment(this.areaContent)
                 .then(() => {

@@ -13,38 +13,12 @@ export function getFirstIssue(labels) {
     const { owner, repo } = store;
     return http.get(`/repos/${owner}/${repo}/issues`, {
         creator: owner,
-        labels
+        labels,
+        _: Math.random()
     }).then(body => {
         // window.ele_issue = JSON.parse(body);
         return JSON.parse(body)[0];
     });
-}
-
-/**
- *
- *
- * @export
- * @param {number} number
- * @returns
- */
-export function getIssue(number) {
-    const { owner, repo } = store;
-    return http.get(`/repos/${owner}/${repo}/issues/${number}`)
-        .then(body => JSON.parse(body));
-}
-
-/**
- * 获取当前使用的issue
- *
- * @export
- * @param {string} labels
- */
-export function getCurrentIssue(labels) {
-    const { owner, repo } = store;
-    getFirstIssue(owner, repo, labels)
-        .then(issue => {
-
-        });
 }
 
 /**
@@ -116,7 +90,8 @@ export function getComments() {
     const { owner, repo, issue: { number } } = store;
     return http.get(`/repos/${owner}/${repo}/issues/${number}/comments`, {
         page: store.comments.page,
-        per_page: store.comments.per_page
+        per_page: store.comments.per_page,
+        _: Math.random()
     }).then(body => JSON.parse(body));
 }
 
@@ -160,4 +135,16 @@ export function createComment(body) {
     //     }
     //     throw new Error(message);
     // })
+}
+
+/**
+ * 获取issue的点赞信息
+ *
+ * @export
+ * @returns
+ */
+export function issueReactions() {
+    const { owner, repo, issue: { number } } = store;
+    return http.get(`/repos/${owner}/${repo}/issues/${number}/reactions`)
+        .then(body => JSON.parse(body));
 }
