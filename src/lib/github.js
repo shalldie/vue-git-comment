@@ -13,8 +13,7 @@ export function getFirstIssue(labels) {
     const { owner, repo } = store;
     return http.get(`/repos/${owner}/${repo}/issues`, {
         creator: owner,
-        labels,
-        _: Math.random()
+        labels
     }).then(body => {
         // window.ele_issue = JSON.parse(body);
         return JSON.parse(body)[0];
@@ -125,29 +124,40 @@ export function getComments() {
  * 创建个 issue
  *
  * @export
- * @param {string} owner
- * @param {string} repo
  * @param {Array<string>} labels
  * @param {string} title
  * @param {string} body
  * @returns
  */
-export function createIssue(owner, repo, labels, title, body) {
-    return http.post(`/repos/${owner}/${repo}/issues`, { labels, title, body })
-        .catch(({ status, message }) => {
-            if (status == 201) {
-                return message;
-            }
-            throw new Error(message);
-        });
+export function createIssue(labels, title, body) {
+    const { owner, repo } = store;
+    return http.post(`/repos/${owner}/${repo}/issues`, {
+        labels,
+        title,
+        body
+    });
+    // .catch(({ status, message }) => {
+    //     if (status == 201) {
+    //         return message;
+    //     }
+    //     throw new Error(message);
+    // });
 }
-
-export function createComment(owner, repo, number, body) {
-    return http.post(`/repos/${owner}/${repo}/issues/${number}/comments`, { body })
-        .catch(({ status, message }) => {
-            if (status == 201) {
-                return message;
-            }
-            throw new Error(message);
-        })
+/**
+ * 创建一个 comment
+ *
+ * @export
+ * @param {string} body
+ * @returns
+ */
+export function createComment(body) {
+    const { owner, repo, issue: { number } } = store;
+    return http.post(`/repos/${owner}/${repo}/issues/${number}/comments`, { body });
+    // .catch(({ status, message }) => {
+    //     if (status == 201) {
+    //         console.log(status);
+    //         return message;
+    //     }
+    //     throw new Error(message);
+    // })
 }

@@ -8,7 +8,7 @@ import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants
  * https://github.com/shalldie/git-comment
  *
  * @license MIT License
- * @description 一个基于 issue 的评论插件。
+ * @description 一个基于 vue2 + github issue 的评论插件。
  * @author shalldie
  */
 
@@ -189,6 +189,7 @@ class GitComment {
     }
 
     getCurrentPage() {
+        store.comments.loading = true;
         return github.getComments()
             .then(list => {
                 list = list.map((item, index) => {
@@ -206,18 +207,28 @@ class GitComment {
                         }
                     };
                 });
+                store.comments.loading = false;
                 store.comments.list = list;
             });
     }
 
     createIssue() {
         return github.createIssue(
-            store.owner,
-            store.repo,
             [store.key, ...ISSUE_LABELS],
             store.title || document.title.substr(0, 20),
             ISSUE_BODY
         );
+    }
+
+    /**
+     * 创建一个comment
+     *
+     * @param {string} body
+     * @returns
+     * @memberof GitComment
+     */
+    createComment(body) {
+        return github.createComment(body);
     }
 
     //#endregion

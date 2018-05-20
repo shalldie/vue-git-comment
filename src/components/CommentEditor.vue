@@ -14,12 +14,12 @@
                 <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
-                <textarea v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin" class="ce-textarea" placeholder="Leave a comment."></textarea>
+                <textarea v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
             <div class="ce-commit-row">
                 <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">Styling with Markdown is supported</a>
-                <button :disabled="!store.ifLogin" class="ce-commit-btn">Comment</button>
+                <button :disabled="!store.ifLogin||submitting" @click="comment" class="ce-commit-btn">{{submitting?'Submitting ...':'Comment'}}</button>
             </div>
             <div class="ce-power-row">
                 Powered by
@@ -44,6 +44,7 @@ export default {
             githubIcon,
             spinnerIcon,
             showArea: true,
+            submitting: false,
             areaContent: '',
             markdownContent: 'Nothing to preview',
             cacheList: []
@@ -73,18 +74,29 @@ export default {
 
         logOut() {
             gitComment.logOut();
+        },
+
+        comment() {
+            this.submitting = true;
+            gitComment.createComment(this.areaContent)
+                .then(() => {
+                    this.areaContent = '';
+                    this.submitting = false;
+                    this.showArea = true;
+                    return gitComment.getCurrentPage();
+                })
         }
     },
 
     watch: {
         showArea(ifShowArea) {
-            if (ifShowArea || !this.areaContent.trim().length) {
+            this.areaContent = this.areaContent.trim();
+            if (ifShowArea || !this.areaContent.length) {
                 this.markdownContent = 'Nothing to preview';
                 return;
             }
 
             // 尝试从缓存获取
-            this.areaContent = this.areaContent.trim();
             let cache = this.getCache(this.areaContent);
             if (cache) {
                 this.markdownContent = cache;

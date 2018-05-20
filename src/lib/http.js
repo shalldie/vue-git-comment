@@ -24,20 +24,22 @@ function ajax(method, url, data = {}, proxy = false) {
     const xh = new XMLHttpRequest();
 
     xh.onload = function () {
-        if (this.status != 200) {
-            dfd.reject({
-                status: this.status,
-                message: this.responseText
-            });
-            return;
-        }
         dfd.resolve(this.responseText);
+        // if (this.status != 200) {
+        //     dfd.reject({
+        //         status: this.status,
+        //         message: this.responseText
+        //     });
+        //     return;
+        // }
+        // dfd.resolve(this.responseText);
     };
     xh.onerror = function (ex) {
         dfd.reject(ex.message);
     };
 
     if (method === 'GET') {
+        data._ = Math.random();
         url = appendQuery(url, data);
         data = null;
     }
