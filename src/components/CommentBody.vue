@@ -13,7 +13,7 @@
                 <div class="comment-item-main">
                     <div class="cim-header">
                         <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
-                        <span class="cim-time">commented on {{item.created_at}}</span>
+                        <span class="cim-time">commented at {{item.created_at}}</span>
                         <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index)}">
                             <span class="cim-heart-icon" v-html="heartIcon"></span>
                             <span class="cim-heart-num">{{item.likedList.length||''}}</span>
