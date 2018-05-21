@@ -14,7 +14,10 @@
                     <div class="cim-header">
                         <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
                         <span class="cim-time">commented on {{item.created_at}}</span>
-                        <span class="cim-heart-icon" v-html="heartIcon"></span>
+                        <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index)}">
+                            <span class="cim-heart-icon" v-html="heartIcon"></span>
+                            <span class="cim-heart-num">{{item.likedList.length||''}}</span>
+                        </span>
                     </div>
                     <div class="cim-body" v-html="item.body"></div>
                 </div>
@@ -25,8 +28,9 @@
 
 <script>
 import store from '../lib/store';
-import { heartIcon } from '../lib/icons';
+import { heartIcon, githubIcon } from '../lib/icons';
 import gitComment from '../lib/gitComment';
+import * as github from '../lib/github';
 
 export default {
     data() {
@@ -45,6 +49,36 @@ export default {
                     this.creating = false;
                     store.issue.created = true;
                     gitComment.init();
+                });
+        },
+        /**
+         * 是否 `heart`
+         */
+        ifHeart(index) {
+            let list = store.comments.list[index].likedList;
+            return list.filter(item => item.name == store.userInfo.name).length > 0;
+        },
+
+        toggleHeart(index) {
+            let commentItem = store.comments.list[index];
+            if (this.ifHeart(index)) {
+                let heartId = commentItem.likedList
+                    .filter(item => item.name == store.userInfo.name)[0].id;
+                github.deleteCommentHeart(heartId)
+                    .then(() => {
+                        commentItem.likedList = commentItem.likedList
+                            .filter(n => n.name != store.userInfo.name);
+                        store.comments.list = store.comments.list.slice();
+                    });
+                return;
+            }
+            github.heartComment(commentItem.id)
+                .then(result => {
+                    commentItem.likedList.push({
+                        id: result.id,
+                        name: result.user.login
+                    });
+                    store.comments.list = store.comments.list.slice();
                 });
         }
     }
@@ -98,14 +132,29 @@ export default {
                             font-size: 14px;
                         }
 
-                        .cim-heart-icon {
+                        .cim-heart-item {
                             float: right;
-                            width: 20px;
-                            height: 20px;
-                            svg {
-                                fill: #333;
+                            cursor: pointer;
+
+                            .cim-heart-icon {
                                 width: 20px;
                                 height: 20px;
+                                svg {
+                                    fill: #333;
+                                    width: 20px;
+                                    height: 20px;
+                                }
+                            }
+
+                            &.liked svg {
+                                fill: #f44336;
+                            }
+
+                            .cim-heart-num {
+                                float: right;
+                                line-height: 20px;
+                                font-size: 14px;
+                                margin-left: 3px;
                             }
                         }
                     }

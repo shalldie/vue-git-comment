@@ -151,10 +151,10 @@ export function issueReactions() {
 
 /**
  * 获取comment的点赞信息
- * 
+ *
  * @export
- * @param {any} commentId 
- * @returns 
+ * @param {any} commentId
+ * @returns
  */
 export function commentReactions(commentId) {
     const { owner, repo } = store;
@@ -164,32 +164,35 @@ export function commentReactions(commentId) {
 
 /**
  * 给issue点赞
- * 
+ *
  * @export
- * @returns 
+ * @returns
  */
 export function heartIssue() {
     const { owner, repo, issue: { number } } = store;
     return http.post(`/repos/${owner}/${repo}/issues/${number}/reactions`, {
         content: 'heart'
-    });
+    }).then(body => JSON.parse(body));
 }
 
 /**
  * 取消issue的赞
- * 
+ *
  * @export
  * @param {string} id heart的id
- * @returns 
+ * @returns
  */
 export function deleteIssueHeart(heartId) {
     return http.delete(`/reactions/${heartId}`);
 }
 
 export function heartComment(commentId) {
-
+    const { owner, repo, issue: { number } } = store;
+    return http.post(`/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`, {
+        content: 'heart'
+    }).then(body => JSON.parse(body));
 }
 
 export function deleteCommentHeart(heartId) {
-
+    return deleteIssueHeart(heartId);
 }

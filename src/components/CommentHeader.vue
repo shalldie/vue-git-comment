@@ -20,6 +20,7 @@
 <script>
 import store from '../lib/store';
 import { heartIcon } from '../lib/icons';
+import * as github from '../lib/github';
 
 export default {
 
@@ -33,13 +34,30 @@ export default {
 
     computed: {
         liked() {
-            return ~store.issue.likedList.indexOf(store.userInfo.name);
+            return ~store.issue.likedList
+                .map(n => n.name).indexOf(store.userInfo.name);
         }
     },
 
     methods: {
         toggleLike() {
-            this.liked = !this.liked;
+            if (this.liked) {
+                let heartId = store.issue.likedList
+                    .filter(n => n.name == store.userInfo.name)[0].id;
+                github.deleteIssueHeart(heartId)
+                    .then(n => {
+                        store.issue.likedList = store.issue.likedList
+                            .filter(n => n.name != store.userInfo.name);
+                    })
+                return;
+            }
+            github.heartIssue()
+                .then(item => {
+                    store.issue.likedList.push({
+                        id: item.id,
+                        name: item.user.login
+                    });
+                })
         },
         changeSort(ifAsc) {
             this.store.comments.sortedAsc = ifAsc;
