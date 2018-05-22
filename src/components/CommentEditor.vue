@@ -14,7 +14,7 @@
                 <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
-                <textarea v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
+                <textarea @input="updateEditorHeight" ref="editor" v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
             <div class="ce-commit-row">
@@ -59,6 +59,11 @@ export default {
                     return item.preview;
                 }
             }
+        },
+
+        updateEditorHeight() {
+            const ele = this.$refs.editor;
+            ele.style.height = ele.scrollHeight + 1 + 'px';
         },
 
         addCache(content, preview) {
