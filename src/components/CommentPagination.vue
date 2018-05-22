@@ -54,11 +54,15 @@ export default {
             display: inline-block;
             cursor: pointer;
             border: 1px solid #cfd8dc;
-            margin-left: -1px;
+            border-left: none;
+            // margin-left: -1px;
             height: 30px;
             line-height: 28px;
             padding: 0 12px;
-            font-size: 16px;
+            font-size: 12px;
+            &:first-child {
+                border-left: 1px solid #cfd8dc;
+            }
             &:hover,
             &.disabled {
                 background-color: #f5f5f5;

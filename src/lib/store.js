@@ -70,8 +70,14 @@ const store = {
          */
         count: 0,
 
+        /**
+         * 第几页
+         */
         page: 1,
 
+        /**
+         * 每页数量
+         */
         per_page: 10,
 
         /**

@@ -10,10 +10,10 @@
             •
             <strong>{{store.comments.count}}</strong> Comments
         </span>
-        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc,disabled:!store.ifLogin}" class="sort-item" :title="'sort by new'|loginFilter">New</strong>
+        <!-- <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc,disabled:!store.ifLogin}" class="sort-item" :title="'sort by new'|loginFilter">New</strong>
         <strong class="sort-item" style="cursor:default;">•</strong>
         <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item" title="sort by old">Old</strong>
-        <span class="sort-item" style="margin-right:10px;cursor:default;">Sort by</span>
+        <span class="sort-item" style="margin-right:10px;cursor:default;">Sort by</span> -->
     </div>
 </template>
 
