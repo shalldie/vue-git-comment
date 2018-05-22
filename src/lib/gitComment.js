@@ -228,16 +228,18 @@ class GitComment {
                     };
                 });
                 // 有 heart 的时候，去获取具体信息
-                list.forEach(item => {
-                    if (!item.likedList.length) {
-                        return;
-                    }
-                    this._getCommentReactions(item.id)
-                        .then(likedList => {
-                            item.likedList = likedList;
-                            store.comments.list = store.comments.list.slice();
-                        });
-                });
+                if (store.ifLogin) {
+                    list.forEach(item => {
+                        if (!item.likedList.length) {
+                            return;
+                        }
+                        this._getCommentReactions(item.id)
+                            .then(likedList => {
+                                item.likedList = likedList;
+                                store.comments.list = store.comments.list.slice();
+                            });
+                    });
+                }
                 store.comments.loading = false;
                 store.comments.list = list;
             });

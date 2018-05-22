@@ -13,7 +13,9 @@
                 <div class="comment-item-main">
                     <div class="cim-header">
                         <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
-                        <span class="cim-time">commented at {{item.created_at}}</span>
+                        <span class="cim-time">commented at
+                            <span style="white-space:nowrap">{{item.created_at}}</span>
+                        </span>
                         <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index)}">
                             <span class="cim-heart-icon" v-html="heartIcon"></span>
                             <span class="cim-heart-num">{{item.likedList.length||''}}</span>
@@ -113,7 +115,8 @@ export default {
                     padding: 0 15px;
 
                     .cim-header {
-                        height: 20px;
+                        position: relative;
+                        // height: 20px;
                         line-height: 20px;
                         margin: 12px 0;
 
@@ -133,8 +136,18 @@ export default {
                         }
 
                         .cim-heart-item {
-                            float: right;
+                            position: absolute;
+                            right: 0;
+                            top: 0;
+                            display: inline-block;
                             cursor: pointer;
+                            height: 20px;
+                            line-height: 20px;
+                            > .cim-heart-icon,
+                            > .cim-heart-num {
+                                display: inline-block;
+                                vertical-align: middle;
+                            }
 
                             .cim-heart-icon {
                                 width: 20px;
@@ -146,15 +159,16 @@ export default {
                                 }
                             }
 
-                            &.liked svg {
-                                fill: #f44336;
+                            &.liked {
+                                color: #f44336;
+                                svg {
+                                    fill: #f44336;
+                                }
                             }
 
                             .cim-heart-num {
-                                float: right;
                                 line-height: 20px;
                                 font-size: 14px;
-                                margin-left: 3px;
                             }
                         }
                     }

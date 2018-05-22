@@ -18,7 +18,7 @@
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
             <div class="ce-commit-row">
-                <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">Styling with Markdown is supported</a>
+                <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">Markdown is supported</a>
                 <button :disabled="!store.ifLogin||submitting" @click="comment" class="ce-commit-btn">{{submitting?'Submitting ...':'Comment'}}</button>
             </div>
             <div class="ce-power-row">
@@ -132,7 +132,7 @@ export default {
 .vue-git-comment {
     .comment-editor {
         position: relative;
-        margin-top: 15px;
+        margin: 15px 0;
 
         .user-avatar,
         .user-avatar svg {
@@ -268,9 +268,10 @@ export default {
             }
 
             .ce-power-row {
-                margin-top: 10px;
+                margin: 10px 0;
                 text-align: right;
                 font-size: 12px;
+                line-height: 34px;
                 a {
                     color: #2196f3;
                     text-decoration: none;

@@ -28,13 +28,19 @@ export default {
 </script>
 
 <style>
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
 #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #333;
-    width: 700px;
-    margin: 50px auto;
+    max-width: 700px;
+    margin: 50px auto 0;
+    padding: 0 15px;
     box-sizing: border-box;
     /* border: 1px solid #ddd; */
 }
