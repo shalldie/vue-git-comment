@@ -41,6 +41,9 @@ export default {
 
     methods: {
         toggleLike() {
+            if (!store.ifLogin) {
+                return;
+            }
             if (this.liked) {
                 let heartId = store.issue.likedList
                     .filter(n => n.name == store.userInfo.name)[0].id;

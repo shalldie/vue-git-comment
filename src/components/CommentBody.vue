@@ -62,6 +62,9 @@ export default {
         },
 
         toggleHeart(index) {
+            if (!store.ifLogin) {
+                return;
+            }
             let commentItem = store.comments.list[index];
             if (this.ifHeart(index)) {
                 let heartId = commentItem.likedList
