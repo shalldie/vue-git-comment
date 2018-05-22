@@ -46,7 +46,8 @@ export default {
         box-sizing: border-box;
     }
 
-    :disabled {
+    :disabled,
+    .disabled {
         cursor: not-allowed !important;
     }
 

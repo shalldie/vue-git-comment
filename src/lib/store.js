@@ -72,12 +72,12 @@ const store = {
 
         page: 1,
 
-        per_page: 20,
+        per_page: 10,
 
         /**
          * true-由旧到新 false-由新到旧
          */
-        sortedAsc: false,
+        sortedAsc: true,
 
         /**
          * 当前页的评论

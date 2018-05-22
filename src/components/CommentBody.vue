@@ -16,7 +16,7 @@
                         <span class="cim-time">commented at
                             <span style="white-space:nowrap">{{item.created_at}}</span>
                         </span>
-                        <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index)}">
+                        <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index),disabled:!store.ifLogin}">
                             <span class="cim-heart-icon" v-html="heartIcon"></span>
                             <span class="cim-heart-num">{{item.likedList.length||''}}</span>
                         </span>

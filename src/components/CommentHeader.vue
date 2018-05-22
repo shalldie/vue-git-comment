@@ -1,6 +1,6 @@
 <template>
     <div class="comment-header">
-        <span @click="toggleLike" class="like-item">
+        <span @click="toggleLike" class="like-item" :class="{disabled:!store.ifLogin}">
             <span :class="{liked:liked}" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
                 <strong>{{store.issue.likedList.length}}</strong> Liked
@@ -10,10 +10,10 @@
             •
             <strong>{{store.comments.count}}</strong> Comments
         </span>
-        <a href="javascript:void(0)" class="issue-link">Issue Page</a>
-        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item" title="sort by old">Old</strong>
+        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc,disabled:!store.ifLogin}" class="sort-item" :title="'sort by new'|loginFilter">New</strong>
         <strong class="sort-item" style="cursor:default;">•</strong>
-        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc}" class="sort-item" title="sort by new">New</strong>
+        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item" title="sort by old">Old</strong>
+        <span class="sort-item" style="margin-right:10px;cursor:default;">Sort by</span>
     </div>
 </template>
 
@@ -36,6 +36,15 @@ export default {
         liked() {
             return ~store.issue.likedList
                 .map(n => n.name).indexOf(store.userInfo.name);
+        }
+    },
+
+    filters: {
+        loginFilter(value) {
+            if (store.ifLogin) {
+                return value;
+            }
+            return 'login first!';
         }
     },
 
@@ -63,6 +72,9 @@ export default {
                 })
         },
         changeSort(ifAsc) {
+            if (!this.store.ifLogin) {
+                return;
+            }
             this.store.comments.sortedAsc = ifAsc;
         }
     }
