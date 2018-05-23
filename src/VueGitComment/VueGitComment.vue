@@ -1,9 +1,9 @@
 <template>
     <div class="vue-git-comment">
-        <CommentHeader />
-        <CommentBody />
-        <CommentPagination />
-        <CommentEditor />
+        <CommentHeader ref="header" />
+        <CommentBody ref="body" />
+        <CommentPagination ref="pager" />
+        <CommentEditor ref="editor" />
     </div>
 </template>
 
@@ -37,6 +37,15 @@ export default {
 
 <style lang="scss">
 @import './github-markdown.css';
+
+@keyframes vue-git-comment-rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 .vue-git-comment {
     color: #333;

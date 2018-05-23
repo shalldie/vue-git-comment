@@ -16,6 +16,12 @@ function ajax(method, url, data = {}, proxy = false) {
     if (!/^http/.test(url)) {
         url = baseUrl + url;
     }
+    if (!store.ifLogin) {
+        Object.assign(data, {
+            client_id: store.client_id,
+            client_secret: store.client_secret
+        });
+    }
     if (proxy) {
         url = 'https://cors-anywhere.herokuapp.com/' + url;
     }

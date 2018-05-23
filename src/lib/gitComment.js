@@ -51,7 +51,7 @@ class GitComment {
         this._getToken(code)
             .then(() => {
                 this.getUserInfo();
-                return this._getIssueInfo();
+                return this.getIssueInfo();
             })
             .then(() => this.getCurrentPage())
             .catch(err => console.log(err));
@@ -68,7 +68,7 @@ class GitComment {
 
         // 如果存在历史token，先验证，再加载数据
         this.getUserInfo();
-        Promise.resolve().then(() => this._getIssueInfo())
+        Promise.resolve().then(() => this.getIssueInfo())
             .then(() => this.getCurrentPage())
             .catch(err => console.log(err));
         return true;
@@ -76,7 +76,7 @@ class GitComment {
 
     _normalStep() {
         console.log('normalstep');
-        this._getIssueInfo()
+        this.getIssueInfo()
             .then(() => this.getCurrentPage())
             .catch(err => console.log(err));
     }
@@ -117,7 +117,7 @@ class GitComment {
             });
     }
 
-    _getIssueInfo() {
+    getIssueInfo() {
         return github
             .getFirstIssue([store.key, ...ISSUE_LABELS].join(','))
             .then(result => {
@@ -251,25 +251,6 @@ class GitComment {
             store.title || document.title.substr(0, 20),
             ISSUE_BODY
         );
-    }
-
-    /**
-     * 创建一个comment
-     *
-     * @param {string} body
-     * @returns
-     * @memberof GitComment
-     */
-    createComment(body) {
-        return github.createComment(body);
-    }
-
-    createIssueHeart() {
-
-    }
-
-    createCommentHeart() {
-
     }
 
     //#endregion

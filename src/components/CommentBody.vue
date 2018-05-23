@@ -6,7 +6,7 @@
             <a @click="createIssue" href="javascript:void(0)">Click</a>
             to create an issue.
         </div>
-        <div v-else-if="store.comments.loading" class="comment-loading">loading ...</div>
+        <div v-else-if="store.comments.loading" class="comment-loading" v-html="spinnerIcon"></div>
         <div v-else class="comment-list">
             <div v-for="(item,index) in store.comments.list" :key="index" class="markdown-body comment-list-item">
                 <img :src="item.user.avatar_url" class="user-avatar">
@@ -30,7 +30,7 @@
 
 <script>
 import store from '../lib/store';
-import { heartIcon, githubIcon } from '../lib/icons';
+import { heartIcon, spinnerIcon } from '../lib/icons';
 import gitComment from '../lib/gitComment';
 import * as github from '../lib/github';
 
@@ -39,6 +39,7 @@ export default {
         return {
             store,
             heartIcon,
+            spinnerIcon,
             creating: false
         };
     },
@@ -94,6 +95,17 @@ export default {
 .vue-git-comment {
     .comment-body {
         margin: 15px 0;
+
+        .comment-loading {
+            text-align: center;
+
+            svg {
+                fill: #333;
+                width: 60px;
+                height: 60px;
+                animation: vue-git-comment-rotate 2s linear infinite;
+            }
+        }
 
         .comment-list {
             position: relative;

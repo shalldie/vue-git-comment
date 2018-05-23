@@ -86,7 +86,7 @@ export default {
                 return;
             }
             this.submitting = true;
-            gitComment.createComment(this.areaContent)
+            github.createComment(this.areaContent)
                 .then(() => {
                     this.areaContent = '';
                     this.submitting = false;
@@ -126,14 +126,6 @@ export default {
 </script>
 
 <style lang="scss">
-@keyframes vue-git-comment-rotate {
-    from {
-        transform: rotate(0);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
 .vue-git-comment {
     .comment-editor {
         position: relative;

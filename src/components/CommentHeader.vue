@@ -10,10 +10,15 @@
             •
             <strong>{{store.comments.count}}</strong> Comments
         </span>
-        <!-- <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc,disabled:!store.ifLogin}" class="sort-item" :title="'sort by new'|loginFilter">New</strong>
+        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc}" class="sort-item">
+            Now
+            <span class="ch-h5-hidden">to early</span>
+        </strong>
         <strong class="sort-item" style="cursor:default;">•</strong>
-        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item" title="sort by old">Old</strong>
-        <span class="sort-item" style="margin-right:10px;cursor:default;">Sort by</span> -->
+        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item">
+            Early
+            <span class="ch-h5-hidden">to now</span>
+        </strong>
     </div>
 </template>
 
@@ -39,20 +44,8 @@ export default {
         }
     },
 
-    filters: {
-        loginFilter(value) {
-            if (store.ifLogin) {
-                return value;
-            }
-            return 'login first!';
-        }
-    },
-
     methods: {
         toggleLike() {
-            if (!store.ifLogin) {
-                return;
-            }
             if (this.liked) {
                 let heartId = store.issue.likedList
                     .filter(n => n.name == store.userInfo.name)[0].id;
@@ -83,6 +76,12 @@ export default {
 </script>
 
 <style lang="scss">
+@media (max-width: 750px) {
+    .ch-h5-hidden {
+        display: none;
+    }
+}
+
 .vue-git-comment {
     .comment-header {
         height: 30px;
