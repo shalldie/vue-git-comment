@@ -215,50 +215,58 @@ class GitComment {
 
         // 如果按时间 asc 排序，则直接查询
         if (store.comments.sortedAsc) {
-            dfd.resolve({ page, per_page });
+            dfd.resolve({ page, per_page, offset: 0 });
         }
-        // 如果按时间 desc 排序，先查一次总数量
+        // 如果按时间 desc 排序，先查一次总数量，然后得到【倒序page、per_page、offset】
         else {
-            dfd.then(() => this.getIssueInfo())
+            this.getIssueInfo()
                 .then(() => {
                     let count = store.comments.count;
-
+                    let match = _.reversePageMatch(page, per_page, count);
+                    dfd.resolve(match);
                 });
         }
-        return github.getComments()
-            .then(list => {
-                list = list.map((item, index) => {
 
-                    return {
-                        id: item.id,
-                        body: _.addTargetBlank(item.body_html),
-                        created_at: _.dateFormat(new Date(item.created_at), 'yyyy/MM/dd HH:mm:ss'),
-                        heart: item.reactions.heart,
-                        hasHeart: false,
-                        likedList: Array(item.reactions.heart),
-                        user: {
-                            name: item.user.login,
-                            avatar_url: item.user.avatar_url,
-                            link: item.user.html_url
-                        }
-                    };
+        dfd.then(match => {  // 先通过偏移量得到数据
+            return github.getComments(match.page, match.per_page)
+                .then(list => {
+                    list = list.slice(match.offset, match.offset + per_page);
+                    !store.comments.sortedAsc && list.reverse();  // 如果倒序查询，需要reverse一哈
+                    return list;
                 });
-                // 有 heart 的时候，去获取具体信息
-                if (store.ifLogin) {
-                    list.forEach(item => {
-                        if (!item.likedList.length) {
-                            return;
-                        }
-                        this._getCommentReactions(item.id)
-                            .then(likedList => {
-                                item.likedList = likedList;
-                                store.comments.list = store.comments.list.slice();
-                            });
-                    });
-                }
-                store.comments.loading = false;
-                store.comments.list = list;
+        }).then(list => {  // 再把最终的结果存储
+            list = list.map((item, index) => {
+
+                return {
+                    id: item.id,
+                    body: _.addTargetBlank(item.body_html),
+                    created_at: _.dateFormat(new Date(item.created_at), 'yyyy/MM/dd HH:mm:ss'),
+                    heart: item.reactions.heart,
+                    hasHeart: false,
+                    likedList: Array(item.reactions.heart),
+                    user: {
+                        name: item.user.login,
+                        avatar_url: item.user.avatar_url,
+                        link: item.user.html_url
+                    }
+                };
             });
+            // 有 heart 的时候，去获取具体信息
+            if (store.ifLogin) {
+                list.forEach(item => {
+                    if (!item.likedList.length) {
+                        return;
+                    }
+                    this._getCommentReactions(item.id)
+                        .then(likedList => {
+                            item.likedList = likedList;
+                            store.comments.list = store.comments.list.slice();
+                        });
+                });
+            }
+            store.comments.loading = false;
+            store.comments.list = list;
+        });
     }
 
     createIssue() {

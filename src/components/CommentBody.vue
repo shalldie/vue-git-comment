@@ -148,6 +148,7 @@ export default {
                         .cim-time {
                             color: #666;
                             font-size: 14px;
+                            margin-right: 30px;
                         }
 
                         .cim-heart-item {

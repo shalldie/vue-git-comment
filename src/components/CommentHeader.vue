@@ -26,6 +26,7 @@
 import store from '../lib/store';
 import { heartIcon } from '../lib/icons';
 import * as github from '../lib/github';
+import gitComment from '../lib/gitComment';
 
 export default {
 
@@ -65,10 +66,13 @@ export default {
                 })
         },
         changeSort(ifAsc) {
-            if (!this.store.ifLogin) {
+            // 懒得写watch了，就这么处理吧
+            if (store.comments.sortedAsc == ifAsc) {
                 return;
             }
-            this.store.comments.sortedAsc = ifAsc;
+            store.comments.sortedAsc = ifAsc;
+            store.comments.page = 1;
+            gitComment.getCurrentPage();
         }
     }
 
@@ -76,7 +80,7 @@ export default {
 </script>
 
 <style lang="scss">
-@media (max-width: 750px) {
+@media (max-width: 450px) {
     .ch-h5-hidden {
         display: none;
     }
