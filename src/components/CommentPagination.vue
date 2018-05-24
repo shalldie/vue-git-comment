@@ -33,7 +33,7 @@ export default {
             this.fetchPage(store.comments.page + 1);
         },
         fetchPage(page) {
-            if (store.comments.page == page) {
+            if (store.comments.page == page || page <= 0 || page > this.pageCount) {
                 return;
             }
             store.comments.page = page;

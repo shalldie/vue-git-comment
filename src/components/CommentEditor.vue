@@ -91,7 +91,7 @@ export default {
                     this.areaContent = '';
                     this.submitting = false;
                     this.showArea = true;
-                    return gitComment.getCurrentPage();
+                    return gitComment.getIssueInfo().then(() => gitComment.getCurrentPage());
                 })
         }
     },

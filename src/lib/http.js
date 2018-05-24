@@ -30,22 +30,23 @@ function ajax(method, url, data = {}, proxy = false) {
     const xh = new XMLHttpRequest();
 
     xh.onload = function () {
-        dfd.resolve(this.responseText);
-        // if (this.status != 200) {
-        //     dfd.reject({
-        //         status: this.status,
-        //         message: this.responseText
-        //     });
-        //     return;
-        // }
-        // dfd.resolve(this.responseText);
+        const contentType = this.getResponseHeader('content-type');
+        if (!/json/.test(contentType)) {
+            dfd.resolve(this.responseText);
+            return;
+        }
+        const data = this.responseText ? JSON.parse(this.responseText) : {};
+        if (data.message) {
+            dfd.reject(data.message);
+            return;
+        }
+        dfd.resolve(data);
     };
     xh.onerror = function (ex) {
         dfd.reject(ex.message);
     };
 
     if (method === 'GET' || method === 'DELETE') {
-        // data._ = Math.random();
         url = appendQuery(url, data);
         data = null;
     }
@@ -77,7 +78,7 @@ export default {
     get: (url, data, proxy) => ajax('get', url, data, proxy),
     /**
      * 进行 delete 请求
-     * 
+     *
      * @param {string} url 地址
      */
     delete: url => ajax('delete', url),

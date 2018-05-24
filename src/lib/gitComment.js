@@ -3,6 +3,7 @@ import { appendQuery, getQuery } from "./utils";
 import * as github from './github';
 import * as _ from './utils';
 import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
+import Deferred from './Deferred';
 
 class GitComment {
     /**
@@ -119,7 +120,7 @@ class GitComment {
 
     getIssueInfo() {
         return github
-            .getFirstIssue([store.key, ...ISSUE_LABELS].join(','))
+            .getFirstIssue()
             .then(result => {
                 // 没有初始化issue
                 if (!result) {
@@ -209,6 +210,21 @@ class GitComment {
 
     getCurrentPage() {
         store.comments.loading = true;
+        let dfd = new Deferred();
+        let { comments: { count, page, per_page } } = store;
+
+        // 如果按时间 asc 排序，则直接查询
+        if (store.comments.sortedAsc) {
+            dfd.resolve({ page, per_page });
+        }
+        // 如果按时间 desc 排序，先查一次总数量
+        else {
+            dfd.then(() => this.getIssueInfo())
+                .then(() => {
+                    let count = store.comments.count;
+
+                });
+        }
         return github.getComments()
             .then(list => {
                 list = list.map((item, index) => {

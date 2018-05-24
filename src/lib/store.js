@@ -78,7 +78,7 @@ const store = {
         /**
          * 每页数量
          */
-        per_page: 10,
+        per_page: 3,
 
         /**
          * true-由旧到新 false-由新到旧

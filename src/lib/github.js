@@ -1,24 +1,22 @@
 import http from './http';
 import { getQuery, appendQuery } from "./utils";
 import store from './store';
+import { ISSUE_LABELS } from './constants';
 
 /**
  * 找到第一个符合的issue
  *
  * @export
- * @param {string} labels labels 用逗号分隔
  * @returns {any>}
  */
-export function getFirstIssue(labels) {
+export function getFirstIssue() {
     const { owner, repo } = store;
+    const labels = [store.key, ...ISSUE_LABELS].join(',');
     return http.get(`/repos/${owner}/${repo}/issues`, {
         creator: owner,
         labels,
         _: Math.random()
-    }).then(body => {
-        // window.ele_issue = JSON.parse(body);
-        return JSON.parse(body)[0];
-    });
+    }).then(data => data[0]);
 }
 
 /**
@@ -63,7 +61,7 @@ export function toAuthorize(client_id) {
  * @returns {Promise<any>}
  */
 export function getAuthUser() {
-    return http.get('/user').then(body => JSON.parse(body));
+    return http.get('/user');
 }
 
 /**
@@ -84,15 +82,17 @@ export function getMarkDown(content) {
  * 获取评论信息
  *
  * @export
+ * @param {number} page 第几页
+ * @param {number} per_page 每页数量
  * @returns
  */
-export function getComments() {
+export function getComments(page, per_page) {
     const { owner, repo, issue: { number } } = store;
     return http.get(`/repos/${owner}/${repo}/issues/${number}/comments`, {
-        page: store.comments.page,
-        per_page: store.comments.per_page,
+        page: page || store.comments.page,
+        per_page: per_page || store.comments.per_page,
         _: Math.random()
-    }).then(body => JSON.parse(body));
+    });
 }
 
 /**
@@ -111,12 +111,6 @@ export function createIssue(labels, title, body) {
         title,
         body
     });
-    // .catch(({ status, message }) => {
-    //     if (status == 201) {
-    //         return message;
-    //     }
-    //     throw new Error(message);
-    // });
 }
 /**
  * 创建一个 comment
@@ -128,13 +122,6 @@ export function createIssue(labels, title, body) {
 export function createComment(body) {
     const { owner, repo, issue: { number } } = store;
     return http.post(`/repos/${owner}/${repo}/issues/${number}/comments`, { body });
-    // .catch(({ status, message }) => {
-    //     if (status == 201) {
-    //         console.log(status);
-    //         return message;
-    //     }
-    //     throw new Error(message);
-    // })
 }
 
 /**
@@ -145,8 +132,7 @@ export function createComment(body) {
  */
 export function issueReactions() {
     const { owner, repo, issue: { number } } = store;
-    return http.get(`/repos/${owner}/${repo}/issues/${number}/reactions`)
-        .then(body => JSON.parse(body));
+    return http.get(`/repos/${owner}/${repo}/issues/${number}/reactions`);
 }
 
 /**
@@ -158,8 +144,7 @@ export function issueReactions() {
  */
 export function commentReactions(commentId) {
     const { owner, repo } = store;
-    return http.get(`/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`)
-        .then(body => JSON.parse(body));
+    return http.get(`/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`);
 }
 
 /**
@@ -172,7 +157,7 @@ export function heartIssue() {
     const { owner, repo, issue: { number } } = store;
     return http.post(`/repos/${owner}/${repo}/issues/${number}/reactions`, {
         content: 'heart'
-    }).then(body => JSON.parse(body));
+    });
 }
 
 /**
@@ -190,7 +175,7 @@ export function heartComment(commentId) {
     const { owner, repo, issue: { number } } = store;
     return http.post(`/repos/${owner}/${repo}/issues/comments/${commentId}/reactions`, {
         content: 'heart'
-    }).then(body => JSON.parse(body));
+    });
 }
 
 export function deleteCommentHeart(heartId) {
