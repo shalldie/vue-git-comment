@@ -4,6 +4,7 @@ import * as github from './github';
 import * as _ from './utils';
 import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
 import Deferred from './Deferred';
+import * as graphql from './graphql';
 
 class GitComment {
     /**
@@ -219,12 +220,28 @@ class GitComment {
         }
         // 如果按时间 desc 排序，先查一次总数量，然后得到【倒序page、per_page、offset】
         else {
-            this.getIssueInfo()
-                .then(() => {
-                    let count = store.comments.count;
-                    let match = _.reversePageMatch(page, per_page, count);
-                    dfd.resolve(match);
-                });
+            // 已登陆，可以用graphql查询数量
+            if (store.ifLogin) {
+                graphql.getCommentsCount()
+                    .then(count => {
+                        store.comments.count = count;
+                        let match = _.reversePageMatch(page, per_page, count);
+                        dfd.resolve(match);
+                    });
+            }
+            // 未登录，用restful api查询
+            else {
+                this.getIssueInfo()
+                    .then(() => {
+                        let count = store.comments.count;
+                        let match = _.reversePageMatch(page, per_page, count);
+                        dfd.resolve(match);
+                    });
+            }
+
+            // let count = store.comments.count;
+            // let match = _.reversePageMatch(page, per_page, count);
+            // dfd.resolve(match);
         }
 
         dfd.then(match => {  // 先通过偏移量得到数据
