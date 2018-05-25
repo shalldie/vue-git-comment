@@ -9,9 +9,9 @@ const baseUrl = 'https://api.github.com';
  * @param {string} method
  * @param {string} url
  * @param {any} [data={}]
- * @param {boolean} [proxy=false]
+ * @param {any} [proxy={}]
  */
-function ajax(method, url, data = {}, proxy = false) {
+function ajax(method, url, data = {}, config = {}) {
     method = method.toUpperCase();
     if (!/^http/.test(url)) {
         url = baseUrl + url;
@@ -22,7 +22,7 @@ function ajax(method, url, data = {}, proxy = false) {
             client_secret: store.client_secret
         });
     }
-    if (proxy) {
+    if (config.proxy) {
         url = 'https://cors-anywhere.herokuapp.com/' + url;
     }
 
@@ -56,7 +56,7 @@ function ajax(method, url, data = {}, proxy = false) {
 
     xh.open(method, url, true);
     xh.setRequestHeader('Accept', '*/*,application/vnd.github.squirrel-girl-preview,application/vnd.github.html+json');
-    if (store.access_token) {
+    if (store.access_token && !config.noAuth) {
         xh.setRequestHeader('Authorization', `token ${store.access_token}`);
     }
     if (method === 'POST') {
@@ -73,9 +73,9 @@ export default {
      *
      * @param {string} url 地址
      * @param {any} data 要传递的数据
-     * @param {boolean} proxy 是否启用代理
+     * @param {any} config 配置
      */
-    get: (url, data, proxy) => ajax('get', url, data, proxy),
+    get: (url, data, config) => ajax('get', url, data, config),
     /**
      * 进行 delete 请求
      *
@@ -87,7 +87,7 @@ export default {
      *
      * @param {string} url 地址
      * @param {any} data 要传递的数据
-     * @param {boolean} proxy 是否启用代理
+     * @param {any} config 是否启用代理
      */
-    post: (url, data, proxy) => ajax('post', url, data, proxy)
+    post: (url, data, config) => ajax('post', url, data, config)
 }

@@ -1,5 +1,8 @@
 /**
  * @description 在登陆后可以用 graphql 进行查询，减少请求响应数据量
+ * 
+ * 但是暂时放弃使用 graphql
+ * 这个需要 Authenticated ，会有 options 请求，太慢
  */
 import store from './store';
 import github from './github';

@@ -13,10 +13,14 @@ export function getFirstIssue() {
     const { owner, repo } = store;
     const labels = [store.key, ...ISSUE_LABELS].join(',');
     return http.get(`/repos/${owner}/${repo}/issues`, {
+        client_id: store.client_id,
+        client_secret: store.client_secret,
         creator: owner,
         labels,
         _: Math.random()
-    }).then(data => data[0]);
+    }, {
+            noAuth: true
+        }).then(data => data[0]);
 }
 
 /**
@@ -33,7 +37,7 @@ export function getToken(code) {
             client_id,
             client_secret,
             code
-        }, true)
+        }, { proxy: true })
         .then(body => getQuery(body, 'access_token'));
 }
 
@@ -89,10 +93,12 @@ export function getMarkDown(content) {
 export function getComments(page, per_page) {
     const { owner, repo, issue: { number } } = store;
     return http.get(`/repos/${owner}/${repo}/issues/${number}/comments`, {
+        client_id: store.client_id,
+        client_secret: store.client_secret,
         page: page || store.comments.page,
         per_page: per_page || store.comments.per_page,
         _: Math.random()
-    });
+    }, { noAuth: true });
 }
 
 /**
