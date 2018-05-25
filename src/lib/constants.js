@@ -12,4 +12,4 @@ export const ISSUE_LABELS = ['vue-git-comment'];
 /**
  * issue 的body
  */
-export const ISSUE_BODY = 'this issue is made for: https://github.com/shalldie/vue-git-comment';
+export const ISSUE_BODY = 'this issue is made by: https://github.com/shalldie/vue-git-comment';

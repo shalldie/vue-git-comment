@@ -11,7 +11,7 @@ import { ISSUE_LABELS } from './constants';
  */
 export function getFirstIssue() {
     const { owner, repo } = store;
-    const labels = [store.key, ...ISSUE_LABELS].join(',');
+    const labels = [store.uuid, ...ISSUE_LABELS].join(',');
     return http.get(`/repos/${owner}/${repo}/issues`, {
         client_id: store.client_id,
         client_secret: store.client_secret,

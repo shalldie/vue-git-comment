@@ -288,7 +288,7 @@ class GitComment {
 
     createIssue() {
         return github.createIssue(
-            [store.key, ...ISSUE_LABELS],
+            [store.uuid, ...ISSUE_LABELS],
             store.title || document.title.substr(0, 20),
             ISSUE_BODY
         );

@@ -15,7 +15,7 @@ const store = {
 
     repo: '',
 
-    key: '',
+    uuid: '',
 
     //#endregion
 
