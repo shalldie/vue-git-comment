@@ -17,7 +17,7 @@ link:
 ```html
 <script src="lib/vue.js"></script>
 
-<link href="dist/vue-git-comment.css"  rel="stylesheet">
+<link href="dist/vue-git-comment.css" rel="stylesheet">
 <script src="dist/vue-git-comment.js"></script>
 ```
 
