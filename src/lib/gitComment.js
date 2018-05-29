@@ -47,7 +47,7 @@ class GitComment {
         if (!code) {
             return false;
         }
-        console.log('backstep');
+        // console.log('backstep');
 
         // 在获取token后，加载数据，获取用户信息
         this._getToken(code)
@@ -65,7 +65,7 @@ class GitComment {
         if (!token) {
             return false;
         }
-        console.log('tokenstep');
+        // console.log('tokenstep');
         store.access_token = token;
 
         // 如果存在历史token，先验证，再加载数据
@@ -77,7 +77,7 @@ class GitComment {
     }
 
     _normalStep() {
-        console.log('normalstep');
+        // console.log('normalstep');
         this.getIssueInfo()
             .then(() => this.getCurrentPage())
             .catch(err => console.log(err));

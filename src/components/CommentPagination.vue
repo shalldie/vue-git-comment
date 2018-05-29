@@ -1,6 +1,6 @@
 <template>
     <ul class="comment-pagination">
-        <li @click="prevPage" :class="{disabled:store.comments.page<=1}" class="comment-page-item">Prev page</li>
+        <!-- <li @click="prevPage" :class="{disabled:store.comments.page<=1}" class="comment-page-item">Prev page</li> -->
         <li @click="fetchPage(index+1)" v-for="(item,index) in pageCount" :key="index" :class="{disabled:index+1==store.comments.page}" class="comment-page-item">{{index+1}}</li>
         <li @click="nextPage" :class="{disabled:store.comments.page>=pageCount}" class="comment-page-item">Next page</li>
     </ul>
@@ -26,9 +26,9 @@ export default {
     },
 
     methods: {
-        prevPage() {
-            this.fetchPage(store.comments.page - 1);
-        },
+        // prevPage() {
+        //     this.fetchPage(store.comments.page - 1);
+        // },
         nextPage() {
             this.fetchPage(store.comments.page + 1);
         },
