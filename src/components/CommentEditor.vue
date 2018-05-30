@@ -236,6 +236,7 @@ export default {
                     background-color: #fff;
                     color: #333;
                     border: none;
+                    margin: 0;
                 }
                 .ce-preview {
                     min-height: 150px;
