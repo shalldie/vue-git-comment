@@ -10,7 +10,7 @@
         <div v-else class="comment-list">
             <div v-for="(item,index) in store.comments.list" :key="index" class="markdown-body comment-list-item">
                 <img :src="item.user.avatar_url" class="user-avatar">
-                <div class="comment-item-main">
+                <div class="comment-item-main has-border">
                     <div class="cim-header">
                         <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
                         <span class="cim-time">commented at
@@ -124,6 +124,7 @@ export default {
                 }
 
                 .comment-item-main {
+                    position: relative;
                     margin-left: 60px;
                     border: 1px solid #cfd8dc;
                     // min-height: 100px;

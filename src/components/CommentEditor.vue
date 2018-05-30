@@ -211,23 +211,34 @@ export default {
             }
 
             .ce-body {
+                position: relative;
+                border: 1px solid #cfd8dc;
+                border-top: none;
+                font-size: 0;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    left: -1px;
+                    top: -1px;
+                    width: 1px;
+                    height: 1px;
+                    background: #cfd8dc;
+                }
                 .ce-textarea {
                     display: block;
                     outline: none;
                     width: 100%;
                     min-height: 150px;
-                    border: 1px solid #cfd8dc;
-                    border-top: none;
                     padding: 16px;
                     font-size: 14px;
                     resize: vertical;
                     background-color: #fff;
                     color: #333;
+                    border: none;
                 }
                 .ce-preview {
                     min-height: 150px;
-                    border: 1px solid #cfd8dc;
-                    border-top: none;
                     background-color: #fff;
                     padding: 16px;
                 }
