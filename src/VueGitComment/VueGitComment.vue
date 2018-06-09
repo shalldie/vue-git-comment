@@ -29,8 +29,14 @@ export default {
         CommentEditor
     },
 
-    mounted() {
-        gitComment.config(this.options);
+    watch: {
+        options: {
+            handler: function (newOptions) {
+                gitComment.config(newOptions);
+            },
+            deep: true,
+            immediate: true
+        }
     }
 };
 </script>

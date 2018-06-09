@@ -23,6 +23,13 @@ export default {
                 uuid: 'esaffeffdfdsaflgfdjsa'
             }
         };
+    },
+
+    created() {
+        // setTimeout(() => {
+        //     this.options.uuid += '3';
+        //     console.log(this.options);
+        // }, 5000);
     }
 }
 </script>
