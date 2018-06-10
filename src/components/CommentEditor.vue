@@ -14,7 +14,7 @@
                 <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
-                <textarea @input="updateEditorHeight" ref="editor" v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
+                <textarea ref="editor" v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
             <div class="ce-commit-row">
