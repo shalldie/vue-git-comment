@@ -2,10 +2,10 @@
  * 将参数转换成 &key=value 格式
  *
  * @export
- * @param {any} params
+ * @param {Record<string, any>} params
  * @returns {string}
  */
-export function stringifyQuery(params) {
+export function stringifyQuery(params: Record<string, any>): string {
     return Object.keys(params)
         .map(key => `${key}=${encodeURIComponent(params[key])}`)
         .join('&');
@@ -16,32 +16,32 @@ export function stringifyQuery(params) {
  *
  * @export
  * @param {string} url 地址
- * @param {any} params 参数
+ * @param {any} query 参数
  * @returns {string}
  */
-export function appendQuery(url, params) {
+export function appendQuery(url: string, query: any): string {
     if (!~url.indexOf('?')) {
-        return url + '?' + stringifyQuery(params);
+        return url + '?' + stringifyQuery(query);
     }
 
     if (url[url.length - 1] !== '&') {
         url = '&' + url;
     }
 
-    return url + stringifyQuery(params);
+    return url + stringifyQuery(query);
 }
 
 /**
  * 从地址中根据key得到query值
  *
  * @export
- * @param {string} url 地址
  * @param {string} key
+ * @param {string} [url=window.location.href] 地址
  * @returns {string}
  */
-export function getQuery(url, key) {
+export function getQuery(key: string, url: string = window.location.href): string {
     const reg = new RegExp(`${key}=([^&]*)`);
-    let matches = url.match(reg);
+    const matches = url.match(reg);
     if (matches && matches.length) {
         return matches[1];
     }
@@ -55,7 +55,7 @@ export function getQuery(url, key) {
  * @param {string} content
  * @returns
  */
-export function addTargetBlank(content) {
+export function addTargetBlank(content: string) {
     return content.replace(/(<a )/g, '$1target="_blank" ');
 }
 
@@ -67,24 +67,26 @@ export function addTargetBlank(content) {
  * @param {string} format
  * @returns
  */
-export function dateFormat(date, format) {
+export function dateFormat(date: Date, format: string) {
     const dict = {
-        "y+": date.getFullYear(),
-        "M+": date.getMonth() + 1,
-        "d+": date.getDate(),
-        "H+": date.getHours(),
-        "h+": date.getHours() - 12,
-        "m+": date.getMinutes(),
-        "s+": date.getSeconds()
+        'y+': date.getFullYear(),
+        'M+': date.getMonth() + 1,
+        'd+': date.getDate(),
+        'H+': date.getHours(),
+        'h+': date.getHours() - 12,
+        'm+': date.getMinutes(),
+        's+': date.getSeconds()
     };
-    for (let k in dict) {
-        let reg = new RegExp(k, "g");
-        format = format.replace(reg, function (g0) {
-            return ("000000" + dict[k]).slice(-g0.length);
+    for (const k in dict) {
+        const reg = new RegExp(k, 'g');
+        format = format.replace(reg, function(g0: string) {
+            return ('000000' + dict[k as keyof typeof dict]).slice(-g0.length);
         });
     }
     return format;
 }
+
+/* eslint-disable */
 
 /**
  * 根据 第几页、每页数量、总数量 计算倒序时候应该进行查询的 page、per_page、offset
@@ -94,14 +96,17 @@ export function dateFormat(date, format) {
  * @param {number} page 第几页
  * @param {number} per_page 每页数量
  * @param {number} count 总数量
- * @returns {page:number,per_page:number,offset:number}
+ * @returns {page:number;per_page:number;offset:number}
  */
-export function reversePageMatch(page, per_page, count) {
+export function reversePageMatch(
+    page: number,
+    per_page: number,
+    count: number
+): { page: number; per_page: number; offset: number } {
+    let hash: any[] = []; // 存储所有可能
 
-    let hash = [];  // 存储所有可能
-
-    let to = count - (page - 1) * per_page;  // 目标结束位置
-    let from = to - per_page + 1;  // 目标起始位置
+    let to = count - (page - 1) * per_page; // 目标结束位置
+    let from = to - per_page + 1; // 目标起始位置
 
     // i 是转换后每页数量
     for (let i = 100; i >= per_page; i--) {
@@ -122,7 +127,8 @@ export function reversePageMatch(page, per_page, count) {
             }
         }
 
-        if (!ifBetween) { // 该方法符合期望
+        if (!ifBetween) {
+            // 该方法符合期望
             hash.push({
                 page: k,
                 per_page: i,
@@ -148,3 +154,5 @@ export function reversePageMatch(page, per_page, count) {
 
     return hash[0];
 }
+
+/* eslint-enable */

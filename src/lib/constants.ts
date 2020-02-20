@@ -1,4 +1,3 @@
-
 /**
  * 存储在 localStorage 中的key
  */
@@ -13,3 +12,8 @@ export const ISSUE_LABELS = ['vue-git-comment'];
  * issue 的body
  */
 export const ISSUE_BODY = 'this issue is made by: https://github.com/shalldie/vue-git-comment';
+
+/**
+ * 用户登陆跳转时带的 state
+ */
+export const IDENTITY_STATE = 'IDENTITY_STATE';

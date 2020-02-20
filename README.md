@@ -1,6 +1,6 @@
 # vue-git-comment
 
-[![npm](https://img.shields.io/npm/v/vue-git-comment.svg)](https://www.npmjs.com/package/vue-git-comment) ![Github file size](https://img.shields.io/github/size/shalldie/vue-git-comment/dist/vue-git-comment.js.svg)
+[![npm][npm_version_image]][npm_version_url] ![Github file size](https://img.shields.io/github/size/shalldie/vue-git-comment/dist/vue-git-comment.js.svg)
 
 Fork from [GitHub](https://github.com/shalldie/vue-git-comment)
 
@@ -17,7 +17,7 @@ link:
 ```html
 <script src="lib/vue.js"></script>
 
-<link href="dist/vue-git-comment.css" rel="stylesheet">
+<link href="dist/vue-git-comment.css" rel="stylesheet" />
 <script src="dist/vue-git-comment.js"></script>
 ```
 
@@ -124,3 +124,17 @@ gitalk 我也特地去了解了一哈，也是非常优秀的一个项目。但�
         毕竟这个项目刚做好，这么优秀的项目，就让我一个人用好了 0_o
 
 ## Enjoy it! >\_<#@!
+
+[npm_version_image]: https://img.shields.io/npm/v/vue-git-comment.svg
+[npm_version_url]: https://www.npmjs.com/package/vue-git-comment
+
+[cdnjs-version-image]: https://img.shields.io/cdnjs/v/gitalk.svg?style=flat-square
+[cdnjs-version-url]: https://cdnjs.com/libraries/gitalk
+[david-dm-image]: https://david-dm.org/gitalk/gitalk.svg?style=flat-square
+[david-dm-url]: https://david-dm.org/gitalk/gitalk
+[travis-image]: https://img.shields.io/travis/gitalk/gitalk/master.svg?style=flat-square
+[travis-url]: https://travis-ci.org/gitalk/gitalk
+[coveralls-image]: https://img.shields.io/coveralls/gitalk/gitalk/master.svg?style=flat-square
+[coveralls-url]: https://coveralls.io/github/gitalk/gitalk
+[gzip-size]: http://img.badgesize.io/https://unpkg.com/gitalk/dist/gitalk.min.js?compression=gzip&style=flat-square
+[gzip-url]: https://unpkg.com/gitalk/dist/gitalk.min.js

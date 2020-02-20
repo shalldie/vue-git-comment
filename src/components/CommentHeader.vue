@@ -1,103 +1,122 @@
 <template>
     <div class="comment-header">
-        <span @click="toggleLike" class="like-item" :class="{disabled:!store.ifLogin}">
-            <span :class="{liked:liked}" class="heart-icon" v-html="heartIcon"></span>
+        <!-- `喜欢` 部分 -->
+        <span @click="toggleHeart" class="like-item" :class="{ disabled: !store.state.ifLogin }">
+            <!-- loading -->
+            <span v-if="issueHeartLoading" class="heart-icon vgc-rotate" v-html="spinnerIcon"></span>
+            <!-- heart -->
+            <span v-else :class="{ liked: liked }" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
-                <strong>{{store.issue.likedList.length}}</strong> Liked
+                <strong>{{ store.issue.likedList.length }}</strong>
+                <span> Liked</span>
             </span>
         </span>
-        <span class="comment-num">
-            •
-            <strong>{{store.comments.count}}</strong> Comments
-        </span>
-        <strong @click="changeSort(false)" :class="{active:!store.comments.sortedAsc}" class="sort-item">
-            Now
-            <span class="ch-h5-hidden">to early</span>
-        </strong>
-        <strong class="sort-item" style="cursor:default;">•</strong>
-        <strong @click="changeSort(true)" :class="{active:store.comments.sortedAsc}" class="sort-item">
-            Early
-            <span class="ch-h5-hidden">to now</span>
-        </strong>
+        <!-- 分割点 -->
+        <span class="split-point">•</span>
+        <!-- 评论数 -->
+        <a :href="store.issue.html_url" target="_blank" class="comment-num">
+            <strong>{{ store.comments.count }}</strong>
+            <span> Comments</span>
+        </a>
+        <!-- issue page -->
+        <!-- <a class="issue-link" :href="store.issue.url" target="_blank">Issue Page</a> -->
+
+        <div class="sort-item-wrap">
+            <strong @click="changeSort(false)" :class="{ active: !store.comments.sortedAsc }" class="sort-item">
+                Latest
+            </strong>
+            <strong class="split-point">•</strong>
+            <strong @click="changeSort(true)" :class="{ active: store.comments.sortedAsc }" class="sort-item">
+                Earliest
+            </strong>
+        </div>
     </div>
 </template>
 
-<script>
-import store from '../lib/store';
-import { heartIcon } from '../lib/icons';
-import * as github from '../lib/github';
+<script lang="ts">
+import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
+import { heartIcon, spinnerIcon } from '../lib/icons';
+import * as github from '../lib/github';
 
-export default {
+@Component
+export default class CommentHeader extends Vue {
+    spinnerIcon = spinnerIcon; // loading icon
 
-    data() {
-        return {
-            heartIcon,
-            store
-            // liked: true
-        };
-    },
+    heartIcon = heartIcon; // heart icon
 
-    computed: {
-        liked() {
-            return ~store.issue.likedList
-                .map(n => n.name).indexOf(store.userInfo.name);
-        }
-    },
+    issueHeartLoading = false; // issue heart 是否在请求中
 
-    methods: {
-        toggleLike() {
-            if (this.liked) {
-                let heartId = store.issue.likedList
-                    .filter(n => n.name == store.userInfo.name)[0].id;
-                github.deleteIssueHeart(heartId)
-                    .then(n => {
-                        store.issue.likedList = store.issue.likedList
-                            .filter(n => n.name != store.userInfo.name);
-                    })
-                return;
-            }
-            github.heartIssue()
-                .then(item => {
-                    store.issue.likedList.push({
-                        id: item.id,
-                        name: item.user.login
-                    });
-                })
-        },
-        changeSort(ifAsc) {
-            // 懒得写watch了，就这么处理吧
-            if (store.comments.sortedAsc == ifAsc) {
-                return;
-            }
-            store.comments.sortedAsc = ifAsc;
-            store.comments.page = 1;
-            gitComment.getCurrentPage();
-        }
+    @InjectReactive()
+    store!: StateStore;
+
+    get liked(): boolean {
+        return this.store.issue.likedList.some(n => n.name === this.store.userInfo.name);
     }
 
-};
+    toggleHeart() {
+        if (this.issueHeartLoading) {
+            return;
+        }
+
+        this.issueHeartLoading = true;
+        // 如果`喜欢`了，去取消喜欢
+        if (this.liked) {
+            const LikedItem = store.issue.likedList.find(n => n.name == store.userInfo.name);
+            LikedItem &&
+                github.deleteIssueHeart(LikedItem.id).then(() => {
+                    this.issueHeartLoading = false;
+                    store.issue.likedList = store.issue.likedList.filter(n => n.name != store.userInfo.name);
+                });
+            return;
+        }
+        // 否则去 `喜欢`
+        github.heartIssue().then(item => {
+            this.issueHeartLoading = false;
+            store.issue.likedList.push({
+                id: item.id,
+                name: item.user.login
+            });
+        });
+    }
+
+    changeSort(ifAsc: boolean) {
+        // 懒得写watch了，就这么处理吧
+        if (this.store.comments.sortedAsc == ifAsc) {
+            return;
+        }
+        this.store.comments.sortedAsc = ifAsc;
+        this.store.comments.page = 1;
+        gitComment.getCurrentPage();
+    }
+}
 </script>
 
 <style lang="scss">
-@media (max-width: 450px) {
-    .ch-h5-hidden {
-        display: none;
-    }
-}
-
 .vue-git-comment {
     .comment-header {
-        height: 30px;
-        font-size: 0;
+        font-size: 14px;
+        height: $HEADER_HEIGHT;
+        line-height: $HEADER_HEIGHT;
+        // border-bottom: 1px solid $BORDER_COLOR;
+        // background: #ddd;
+        @include flex;
+
+        // `喜欢` 部分
         .like-item {
-            display: inline-block;
-            height: 30px;
-            margin-left: -5px;
+            height: $HEADER_HEIGHT;
             cursor: pointer;
+            @include flex;
+
+            > span {
+                // @include inline-middle;
+                height: $HEADER_HEIGHT;
+            }
+            // margin-left: -5px;
             .heart-icon {
-                display: inline-block;
-                vertical-align: middle;
+                // display: inline-block;
+                // vertical-align: middle;
                 svg {
                     width: 30px;
                     height: 30px;
@@ -106,27 +125,39 @@ export default {
                     fill: #f44336;
                 }
             }
+            .heart-txt {
+                margin-left: 5px;
+            }
         }
-        .heart-txt,
-        .comment-num,
-        .sort-item {
-            display: inline-block;
-            vertical-align: middle;
-            font-size: 14px;
-            margin-left: 5px;
+        // 分割点
+        .split-point {
+            margin: 0 5px;
         }
 
-        .sort-item {
-            float: right;
-            color: #666;
-            line-height: 30px;
+        // 评论
+        .comment-num {
+            color: #333;
             cursor: pointer;
-            &.active {
-                color: #f44336;
+            text-decoration: none;
+
+            &:hover {
+                color: $LINK_COLOR;
+                text-decoration: underline;
+            }
+        }
+
+        .sort-item-wrap {
+            margin-left: auto;
+
+            .sort-item {
+                font-size: 14px;
+                cursor: pointer;
+
+                &.active {
+                    color: #f44336;
+                }
             }
         }
     }
 }
 </style>
-
-
