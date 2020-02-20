@@ -1,8 +1,14 @@
 {
   "name": "vue-git-comment",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A vue's comment component base on github's issues.",
   "main": "dist/vue-git-comment.umd.js",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "sh scripts/build.sh",
