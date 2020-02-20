@@ -1,67 +1,69 @@
 <template>
     <ul class="comment-pagination">
         <!-- <li @click="prevPage" :class="{disabled:store.comments.page<=1}" class="comment-page-item">Prev page</li> -->
-        <li @click="fetchPage(index+1)" v-for="(item,index) in pageCount" :key="index" :class="{disabled:index+1==store.comments.page}" class="comment-page-item">{{index+1}}</li>
-        <li @click="nextPage" :class="{disabled:store.comments.page>=pageCount}" class="comment-page-item">Next page</li>
+        <li
+            @click="fetchPage(index + 1)"
+            v-for="(item, index) in pageCount"
+            :key="index"
+            :class="{ disabled: index + 1 == store.comments.page }"
+            class="comment-page-item"
+        >
+            {{ index + 1 }}
+        </li>
+        <li @click="nextPage" :class="{ disabled: store.comments.page >= pageCount }" class="comment-page-item">
+            Next page
+        </li>
     </ul>
 </template>
 
-<script>
-import store from '../lib/store';
-import * as github from '../lib/github';
+<script lang="ts">
+import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 
-export default {
-    data() {
-        return {
-            store
-        };
-    },
+@Component
+export default class CommentPagination extends Vue {
+    @InjectReactive()
+    store!: StateStore;
 
-    computed: {
-        pageCount() {
-            const { per_page, count } = this.store.comments;
-            return Math.ceil(count / per_page) || 1;
-        }
-    },
-
-    methods: {
-        // prevPage() {
-        //     this.fetchPage(store.comments.page - 1);
-        // },
-        nextPage() {
-            this.fetchPage(store.comments.page + 1);
-        },
-        fetchPage(page) {
-            if (store.comments.page == page || page <= 0 || page > this.pageCount) {
-                return;
-            }
-            store.comments.page = page;
-            gitComment.getCurrentPage();
-        }
+    get pageCount() {
+        const { per_page, count } = this.store.comments;
+        return Math.ceil(count / per_page) || 1;
     }
-};
+
+    nextPage() {
+        this.fetchPage(this.store.comments.page + 1);
+    }
+
+    fetchPage(page: number) {
+        if (this.store.comments.page === page || page <= 0 || page > this.pageCount) {
+            return;
+        }
+        store.comments.page = page;
+        gitComment.getCurrentPage();
+    }
+}
 </script>
 
 <style lang="scss">
 .vue-git-comment {
     .comment-pagination {
-        margin: 10px 0;
+        margin: 20px 0;
         padding: 0;
-        text-align: right;
-        font-size: 0;
+        @include flex;
+        justify-content: flex-end;
+
         .comment-page-item {
             display: inline-block;
             cursor: pointer;
-            border: 1px solid #cfd8dc;
+            border: 1px solid $BORDER_COLOR;
             border-left: none;
-            // margin-left: -1px;
             height: 30px;
             line-height: 28px;
             padding: 0 12px;
             font-size: 12px;
             &:first-child {
-                border-left: 1px solid #cfd8dc;
+                border-left: 1px solid $BORDER_COLOR;
             }
             &:hover,
             &.disabled {

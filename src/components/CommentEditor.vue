@@ -1,152 +1,163 @@
 <template>
     <div class="comment-editor">
-        <span class="user-avatar" v-if="!store.ifLogin&&!store.userInfo.loading" href="javascript:void(0)" v-html="githubIcon"></span>
-        <span class="user-avatar user-avatar-loading" v-else-if="!store.ifLogin&&store.userInfo.loading" v-html="spinnerIcon"></span>
-        <img class="user-avatar user-avatar-img" v-else :src="store.userInfo.avatar_url">
+        <!-- 没登陆，且没loading， 显示github的icon -->
+        <span
+            v-if="!store.state.ifLogin && !store.userInfo.loading"
+            class="user-avatar user-avatar-github"
+            v-html="githubIcon"
+        ></span>
+        <!-- 正在登陆的适合，显示 loading -->
+        <span v-else-if="store.userInfo.loading" class="user-avatar user-avatar-loading" v-html="spinnerIcon"></span>
+        <!-- 其它，登陆的情况下 -->
+        <a v-else :href="store.userInfo.html_url" target="_blank">
+            <img class="user-avatar user-avatar-img" :src="store.userInfo.avatar_url" />
+        </a>
+        <!-- 编辑器容器 -->
         <div class="comment-editor-main">
-            <div class="ce-header has-border">
-                <div @click="showArea=true" :class="{active:showArea}" class="ce-tab-item">Write</div>
-                <div @click="showArea=false" :class="{active:!showArea}" class="ce-tab-item">Preview</div>
-                <div v-if="!store.ifLogin" class="login-link-btn">
+            <div class="ce-header border-arrow">
+                <div @click="showArea = true" :class="{ active: showArea }" class="ce-tab-item">Write</div>
+                <div @click="showArea = false" :class="{ active: !showArea }" class="ce-tab-item">Preview</div>
+                <div v-if="!store.state.ifLogin" class="login-link-btn">
                     <a @click="login" href="javascript:void(0)">Login</a>
-                    with Github
+                    <span> with Github</span>
                 </div>
                 <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
-                <textarea ref="editor" v-model="areaContent" v-show="showArea" :disabled="!store.ifLogin||submitting" class="ce-textarea" placeholder="Leave a comment."></textarea>
+                <textarea
+                    ref="editor"
+                    v-model="areaContent"
+                    v-show="showArea"
+                    :disabled="!store.state.ifLogin || submitting"
+                    class="ce-textarea"
+                    placeholder="Leave a comment."
+                ></textarea>
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
-            <div class="ce-commit-row">
-                <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">Markdown is supported</a>
-                <button :disabled="!store.ifLogin||submitting" @click="comment" class="ce-commit-btn">{{submitting?'Submitting ...':'Comment'}}</button>
+            <div class="ce-comment-row">
+                <div class="ce-link-wrap">
+                    <a class="ce-md-link" target="_blank" href="https://guides.github.com/features/mastering-markdown/">
+                        Markdown is supported
+                    </a>
+                </div>
+
+                <button :disabled="!store.state.ifLogin || submitting" @click="comment" class="ce-comment-btn">
+                    {{ submitting ? 'Submitting ...' : 'Comment' }}
+                </button>
             </div>
             <div class="ce-power-row">
-                Powered by
+                <span>Powered by </span>
                 <a target="_blank" href="https://github.com/shalldie/vue-git-comment">vue-git-comment</a>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-import store from '../lib/store';
-import * as github from '../lib/github';
-import { githubIcon, spinnerIcon } from '../lib/icons';
+<script lang="ts">
+import { Component, Vue, InjectReactive, Watch } from 'vue-property-decorator';
+import { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
-import * as _ from '../lib/utils';
+import { githubIcon, spinnerIcon } from '../lib/icons';
+import * as github from '../lib/github';
+import { addTargetBlank } from '../lib/utils';
 
-export default {
+@Component
+export default class CommentEditor extends Vue {
+    githubIcon = githubIcon;
 
-    data() {
-        return {
-            store,
-            githubIcon,
-            spinnerIcon,
-            showArea: true,
-            submitting: false,
-            areaContent: '',
-            markdownContent: 'Nothing to preview',
-            cacheList: []
-        };
-    },
+    spinnerIcon = spinnerIcon;
 
-    methods: {
-        getCache(content) {
-            for (let i = 0, len = this.cacheList.length; i < len; i++) {
-                let item = this.cacheList[i];
-                if (item.content === content) {
-                    return item.preview;
-                }
-            }
-        },
+    showArea = true; // 是否展示 textarea
 
-        updateEditorHeight() {
-            const ele = this.$refs.editor;
-            ele.style.height = ele.scrollHeight + 1 + 'px';
-        },
+    submitting = false;
 
-        addCache(content, preview) {
-            this.cacheList.push({ content, preview });
-            if (this.cacheList.length > 10) {
-                this.cacheList.shift();
-            }
-        },
+    areaContent = '';
 
-        login() {
-            gitComment.login();
-        },
+    markdownContent = 'Nothing to preview';
 
-        logOut() {
-            gitComment.logOut();
-        },
+    cacheList: { content: string; preview: string }[] = [];
 
-        comment() {
-            if (this.areaContent.trim().length <= 0) {
-                return;
-            }
-            this.submitting = true;
-            github.createComment(this.areaContent)
-                .then(() => {
-                    this.areaContent = '';
-                    this.submitting = false;
-                    this.showArea = true;
-                    return gitComment.getIssueInfo().then(() => gitComment.getCurrentPage());
-                })
-        }
-    },
+    @InjectReactive()
+    store!: StateStore;
 
-    watch: {
-        showArea(ifShowArea) {
-            this.areaContent = this.areaContent.trim();
-            if (ifShowArea || !this.areaContent.length) {
-                this.markdownContent = 'Nothing to preview';
-                return;
-            }
-
-            // 尝试从缓存获取
-            let cache = this.getCache(this.areaContent);
-            if (cache) {
-                this.markdownContent = cache;
-                return;
-            }
-
-            // 从接口获取，并缓存
-            this.markdownContent = 'Loading preview ...';
-            github.getMarkDown(this.areaContent)
-                .then(body => {
-                    body = _.addTargetBlank(body);
-                    this.markdownContent = body;
-                    this.addCache(this.areaContent, body);
-                });
+    getCache(content) {
+        const item = this.cacheList.find(n => n.content === content);
+        if (item) {
+            return item.preview;
         }
     }
-};
 
+    addCache(content, preview) {
+        this.cacheList.push({ content, preview });
+        if (this.cacheList.length > 10) {
+            this.cacheList.shift();
+        }
+    }
+
+    login() {
+        gitComment.login();
+    }
+
+    logOut() {
+        gitComment.logOut();
+    }
+
+    comment() {
+        if (this.areaContent.trim().length <= 0) {
+            return;
+        }
+        this.submitting = true;
+        github.createComment(this.areaContent).then(() => {
+            this.areaContent = '';
+            this.submitting = false;
+            this.showArea = true;
+            return gitComment.getCurrentPage(true);
+        });
+    }
+
+    @Watch('showArea')
+    handleShowAreaChange(ifShowArea: boolean) {
+        this.areaContent = this.areaContent.trim();
+        if (ifShowArea || !this.areaContent.length) {
+            this.markdownContent = 'Nothing to preview';
+            return;
+        }
+
+        // 尝试从缓存获取
+        const cache = this.getCache(this.areaContent);
+        if (cache) {
+            this.markdownContent = cache;
+            return;
+        }
+
+        // 从接口获取，并缓存
+        this.markdownContent = 'Loading preview ...';
+        github.getMarkDown(this.areaContent).then(body => {
+            body = addTargetBlank(body);
+            this.markdownContent = body;
+            this.addCache(this.areaContent, body);
+        });
+    }
+}
 </script>
 
 <style lang="scss">
+$TAB_HEIGHT: 40px;
+
 .vue-git-comment {
     .comment-editor {
         position: relative;
-        margin: 15px 0;
+        // margin: 15px 0;
+        @include flex;
+        align-items: flex-start;
 
+        // 头像部分
         .user-avatar,
         .user-avatar svg {
             width: 44px;
             height: 44px;
             border-radius: 3px;
             fill: #fff;
-            cursor: pointer;
-        }
-
-        .user-avatar,
-        .user-avatar-loading {
-            position: absolute;
-            left: 0;
-            top: 0;
-            display: inline-block;
-            background: #333;
         }
 
         .user-avatar-loading {
@@ -157,40 +168,52 @@ export default {
             }
         }
 
-        .user-avatar-img {
-            background: none;
+        .user-avatar-github {
+            background: #333;
         }
 
+        .user-avatar-img {
+            cursor: pointer;
+        }
+        // 编辑器
         .comment-editor-main {
-            margin-left: 60px;
+            @include flex-item;
+            margin-left: 20px;
 
             .ce-header {
+                font-size: 14px;
                 position: relative;
-                height: 40px;
-                font-size: 0;
-                border: 1px solid #cfd8dc;
+                height: $TAB_HEIGHT;
+                line-height: $TAB_HEIGHT;
+                border: 1px solid $BORDER_COLOR;
+                @include flex;
 
-                .ce-tab-item,
-                .login-link-btn {
-                    height: 40px;
-                    line-height: 40px;
-                    display: inline-block;
-                    vertical-align: middle;
-                    font-size: 14px;
+                // tab
+                .ce-tab-item {
+                    height: $TAB_HEIGHT;
+                    margin-top: -1px;
                     padding: 0 12px;
                     cursor: pointer;
-                    margin-left: -1px;
-                    margin-top: -1px;
                     border: 1px solid transparent;
 
+                    &:nth-child(2) {
+                        border-left-color: $BORDER_COLOR;
+                        margin-left: -1px;
+                    }
+
                     &.active {
-                        border-color: #cfd8dc;
-                        border-bottom-color: #fff;
+                        border-right-color: $BORDER_COLOR;
+                        border-bottom-color: $BG_COLOR;
                     }
                 }
 
+                // login,logout
+                .login-link-btn,
+                .logout-link {
+                    margin: -1px 12px 0 auto;
+                }
+
                 .login-link-btn {
-                    float: right;
                     cursor: default;
                     a {
                         text-decoration: none;
@@ -198,33 +221,19 @@ export default {
                 }
 
                 .logout-link {
-                    float: right;
-                    line-height: 40px;
-                    font-size: 14px;
-                    margin-right: 12px;
-                    margin-top: -1px;
-                    cursor: pointer;
                     &:hover {
-                        color: #2196f3;
+                        cursor: pointer;
+                        color: $LINK_COLOR;
                     }
                 }
             }
 
+            // 编辑器部分
             .ce-body {
                 position: relative;
-                border: 1px solid #cfd8dc;
+                border: 1px solid $BORDER_COLOR;
                 border-top: none;
-                font-size: 0;
 
-                &::before {
-                    content: '';
-                    position: absolute;
-                    left: -1px;
-                    top: -1px;
-                    width: 1px;
-                    height: 1px;
-                    background: #cfd8dc;
-                }
                 .ce-textarea {
                     display: block;
                     outline: none;
@@ -232,37 +241,43 @@ export default {
                     min-height: 150px;
                     padding: 16px;
                     font-size: 14px;
-                    resize: vertical;
-                    background-color: #fff;
+                    resize: none;
                     color: #333;
                     border: none;
                     margin: 0;
                 }
                 .ce-preview {
                     min-height: 150px;
-                    background-color: #fff;
                     padding: 16px;
                 }
             }
 
-            .ce-commit-row {
+            // 编辑器底部行
+            .ce-comment-row {
                 height: 34px;
-                line-height: 34px;
+                // line-height: 34px;
                 margin-top: 10px;
+                @include flex;
 
-                .ce-md-link {
-                    font-size: 12px;
-                    color: #666;
-                    text-decoration: none;
-                    &:hover {
-                        color: #2196f3;
+                .ce-link-wrap {
+                    height: 100%;
+                    @include flex-item;
+
+                    // markdown support 提示
+                    .ce-md-link {
+                        font-size: 12px;
+                        line-height: 1;
+                        color: #333;
+                        text-decoration: none;
+                        &:hover {
+                            color: #2196f3;
+                        }
                     }
                 }
 
-                .ce-commit-btn {
+                .ce-comment-btn {
                     color: #fff;
-                    float: right;
-                    height: 34px;
+                    line-height: 34px;
                     font-size: 14px;
                     font-weight: bold;
                     padding: 0 12px;
@@ -276,13 +291,14 @@ export default {
                 }
             }
 
+            // power by 提示
             .ce-power-row {
                 margin: 10px 0;
                 text-align: right;
                 font-size: 12px;
                 line-height: 34px;
+
                 a {
-                    color: #2196f3;
                     text-decoration: none;
                     &:hover {
                         text-decoration: underline;
@@ -293,5 +309,3 @@ export default {
     }
 }
 </style>
-
-

@@ -1,100 +1,140 @@
 <template>
     <div class="comment-body">
-        <div v-if="creating">Be creating...</div>
-        <div v-else-if="!store.issue.created&&store.owner===store.userInfo.name">
+        <div v-if="creating">Creating...</div>
+        <div v-else-if="!store.issue.created && store.options.owner === store.userInfo.name">
             Seems new,
             <a @click="createIssue" href="javascript:void(0)">Click</a>
             to create an issue.
         </div>
         <div v-else-if="store.comments.loading" class="comment-loading" v-html="spinnerIcon"></div>
         <div v-else class="comment-list">
-            <div v-for="(item,index) in store.comments.list" :key="index" class="markdown-body comment-list-item">
-                <img :src="item.user.avatar_url" class="user-avatar">
-                <div class="comment-item-main has-border">
+            <div v-for="(item, index) in store.comments.list" :key="index" class="markdown-body comment-list-item">
+                <a :href="item.user.link" target="_blank">
+                    <img :src="item.user.avatar_url" class="user-avatar" />
+                </a>
+                <div class="comment-item-main border-arrow">
+                    <!-- 评论的头部 -->
                     <div class="cim-header">
-                        <a class="cim-name" target="_blank" :href="item.user.link">{{item.user.name}}</a>
-                        <span class="cim-time">commented at
-                            <span style="white-space:nowrap">{{item.created_at}}</span>
-                        </span>
-                        <span @click="toggleHeart(index)" class="cim-heart-item" :class="{liked:ifHeart(index),disabled:!store.ifLogin}">
-                            <span class="cim-heart-icon" v-html="heartIcon"></span>
-                            <span class="cim-heart-num">{{item.likedList.length||''}}</span>
-                        </span>
+                        <!-- 评论信息部分 -->
+                        <div class="cim-info-wrap">
+                            <a class="cim-name" target="_blank" :href="item.user.link">{{ item.user.name }}</a>
+                            <span class="cim-time"> commented on </span>
+                            <span class="cim-time">{{ item.created_at }}</span>
+                        </div>
+                        <!-- 评论的反馈 reaction -->
+                        <div class="cim-reaction">
+                            <!-- heart -->
+                            <span
+                                @click="toggleHeart(index)"
+                                class="cim-heart-item"
+                                :class="{
+                                    liked: heartMap[index],
+                                    disabled: !store.state.ifLogin,
+                                    'vgc-busy': item.heartLoading
+                                }"
+                            >
+                                <!-- heart 的icon -->
+                                <span v-if="!item.heartLoading" class="cim-heart-icon" v-html="heartIcon"></span>
+                                <!-- loading 的icon -->
+                                <span v-else class="cim-heart-icon vgc-rotate" v-html="spinnerIcon"></span>
+                                <span class="cim-heart-num">{{ item.likedList.length || '' }}</span>
+                            </span>
+                            <!-- reply -->
+                            <span @click="handleReply(item)" class="cim-reply-item" v-html="replyIcon"></span>
+                        </div>
                     </div>
-                    <div class="cim-body" v-html="item.body"></div>
+                    <div class="cim-body" v-html="item.body_html"></div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script>
-import store from '../lib/store';
-import { heartIcon, spinnerIcon } from '../lib/icons';
+<script lang="ts">
+import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
+import { heartIcon, spinnerIcon, replyIcon } from '../lib/icons';
 import * as github from '../lib/github';
+import CommentEditor from './CommentEditor.vue';
 
-export default {
-    data() {
-        return {
-            store,
-            heartIcon,
-            spinnerIcon,
-            creating: false
-        };
-    },
+@Component
+export default class CommentBody extends Vue {
+    heartIcon = heartIcon;
+    spinnerIcon = spinnerIcon;
+    replyIcon = replyIcon;
 
-    methods: {
-        createIssue() {
-            this.creating = true;
-            gitComment.createIssue()
-                .then(() => {
-                    this.creating = false;
-                    store.issue.created = true;
-                    gitComment.init();
-                });
-        },
-        /**
-         * 是否 `heart`
-         */
-        ifHeart(index) {
-            let list = store.comments.list[index].likedList;
-            return list.filter(item => item.name == store.userInfo.name).length > 0;
-        },
+    creating = false;
 
-        toggleHeart(index) {
-            if (!store.ifLogin) {
-                return;
-            }
-            let commentItem = store.comments.list[index];
-            if (this.ifHeart(index)) {
-                let heartId = commentItem.likedList
-                    .filter(item => item.name == store.userInfo.name)[0].id;
-                github.deleteCommentHeart(heartId)
-                    .then(() => {
-                        commentItem.likedList = commentItem.likedList
-                            .filter(n => n.name != store.userInfo.name);
-                        store.comments.list = store.comments.list.slice();
-                    });
-                return;
-            }
-            github.heartComment(commentItem.id)
-                .then(result => {
-                    commentItem.likedList.push({
-                        id: result.id,
-                        name: result.user.login
-                    });
-                    store.comments.list = store.comments.list.slice();
-                });
-        }
+    @InjectReactive()
+    store!: StateStore;
+
+    /**
+     * 是否 `heart` 的字典
+     */
+    get heartMap() {
+        return this.store.comments.list.map(n => {
+            return n.likedList.some(item => item.name == this.store.userInfo.name);
+        });
     }
-};
+
+    createIssue() {
+        this.creating = true;
+        gitComment.createIssue().then(() => {
+            this.creating = false;
+            this.store.issue.created = true;
+            gitComment.init(this.store.options);
+        });
+    }
+
+    toggleHeart(index) {
+        if (!this.store.state.ifLogin) {
+            return;
+        }
+        const loadingKey = 'heartLoading';
+        const commentItem = this.store.comments.list[index];
+
+        if (commentItem[loadingKey]) {
+            return;
+        }
+
+        Vue.set(commentItem, loadingKey, true);
+        if (this.heartMap[index]) {
+            const heartId = commentItem.likedList.filter(item => item.name == this.store.userInfo.name)[0].id;
+            github.deleteCommentHeart(heartId).then(() => {
+                commentItem.likedList = commentItem.likedList.filter(n => n.name != this.store.userInfo.name);
+                // this.store.comments.list = this.store.comments.list.slice();
+                Vue.set(commentItem, loadingKey, false);
+            });
+            return;
+        }
+        github.heartComment(commentItem.id + '').then(result => {
+            commentItem.likedList.push({
+                id: result.id,
+                name: result.user.login
+            });
+            Vue.set(commentItem, loadingKey, false);
+            // this.store.comments.list = this.store.comments.list.slice();
+        });
+    }
+
+    handleReply(item: StateStore['comments']['list'][number]) {
+        const content = [`@${item.user.name}`, ...item.body.split('\n')].map(line => `> ${line}`).join('\n') + '\n';
+        const editor = this.$parent.$refs.editor as CommentEditor;
+        editor.showArea = true;
+        this.$nextTick(() => {
+            editor.areaContent = content;
+            (editor.$refs.editor as HTMLTextAreaElement).focus();
+        });
+    }
+}
 </script>
 
 <style lang="scss">
 .vue-git-comment {
     .comment-body {
-        margin: 15px 0;
+        margin-top: 15px;
+        overflow: hidden;
 
         .comment-loading {
             text-align: center;
@@ -112,82 +152,127 @@ export default {
 
             .comment-list-item {
                 position: relative;
-                margin-bottom: 18px;
+                @include flex;
+                align-items: flex-start;
 
+                &:not(:last-child) {
+                    margin-bottom: 18px;
+                }
+
+                // 头像部分
                 .user-avatar {
-                    position: absolute;
+                    // position: absolute;
                     width: 44px;
                     height: 44px;
                     border-radius: 3px;
-                    left: 0;
-                    top: 0;
                 }
-
+                // 评论正文部分
                 .comment-item-main {
+                    @include flex-item;
                     position: relative;
-                    margin-left: 60px;
+                    margin-left: 20px;
                     border: 1px solid #cfd8dc;
                     // min-height: 100px;
                     padding: 0 15px;
 
+                    // 评论 header
                     .cim-header {
                         position: relative;
-                        // height: 20px;
-                        line-height: 20px;
+                        // height: 24px;
+                        line-height: 24px;
                         margin: 12px 0;
+                        @include flex;
+                        align-items: flex-start;
 
-                        .cim-name {
-                            color: #666;
-                            font-size: 14px;
-                            font-weight: bold;
-                            text-decoration: none;
-                            &:hover {
-                                text-decoration: underline;
+                        // 评论信息概要
+                        .cim-info-wrap {
+                            @include flex-item;
+                            margin-right: 15px;
+                            // @include flex;
+
+                            .cim-name {
+                                color: #666;
+                                font-size: 14px;
+                                font-weight: bold;
+                                text-decoration: none;
+                                &:hover {
+                                    color: $LINK_COLOR;
+                                    text-decoration: underline;
+                                }
+                            }
+
+                            .cim-time {
+                                color: #666;
+                                font-size: 14px;
+                                // margin-right: 30px;
                             }
                         }
 
-                        .cim-time {
-                            color: #666;
-                            font-size: 14px;
-                            margin-right: 30px;
-                        }
+                        // 评论的 reaction 反馈
+                        .cim-reaction {
+                            margin-left: auto;
+                            @include before-middle;
+                            margin-top: -3px; // svg 微调
+                            font-size: 0;
 
-                        .cim-heart-item {
-                            position: absolute;
-                            right: 0;
-                            top: 0;
-                            display: inline-block;
-                            cursor: pointer;
-                            height: 20px;
-                            line-height: 20px;
-                            > .cim-heart-icon,
-                            > .cim-heart-num {
-                                display: inline-block;
-                                vertical-align: middle;
-                            }
-
-                            .cim-heart-icon {
-                                width: 20px;
+                            // heart
+                            .cim-heart-item {
+                                @include inline-middle;
+                                cursor: pointer;
                                 height: 20px;
-                                svg {
-                                    fill: #333;
+                                line-height: 20px;
+
+                                > .cim-heart-icon,
+                                > .cim-heart-num {
+                                    display: inline-block;
+                                    vertical-align: middle;
+                                }
+
+                                .cim-heart-icon {
                                     width: 20px;
                                     height: 20px;
+                                    svg {
+                                        fill: #333;
+                                        width: 20px;
+                                        height: 20px;
+                                    }
+                                }
+
+                                &.liked {
+                                    color: #f44336;
+                                    svg {
+                                        fill: #f44336;
+                                    }
+                                }
+
+                                .cim-heart-num {
+                                    line-height: 20px;
+                                    font-size: 14px;
                                 }
                             }
 
-                            &.liked {
-                                color: #f44336;
+                            // reply
+                            .cim-reply-item {
+                                @include inline-middle;
+                                margin-left: 15px;
+                                cursor: pointer;
+                                width: 16px;
+                                height: 16px;
                                 svg {
-                                    fill: #f44336;
+                                    fill: #586069;
+                                    width: 16px;
+                                    height: 16px;
                                 }
-                            }
 
-                            .cim-heart-num {
-                                line-height: 20px;
-                                font-size: 14px;
+                                &:hover svg {
+                                    fill: $LINK_COLOR;
+                                }
                             }
                         }
+                    }
+
+                    .cim-body {
+                        overflow: hidden;
                     }
                 }
             }
@@ -195,5 +280,3 @@ export default {
     }
 }
 </style>
-
-

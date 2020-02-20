@@ -1,0 +1,29 @@
+@import './variables.scss';
+
+@mixin flex {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+@mixin flex-column {
+    @include flex;
+    flex-direction: column;
+}
+
+@mixin flex-item($num: 1) {
+    flex: $num;
+}
+
+@mixin before-middle {
+    &::before {
+        content: '';
+        height: 100%;
+        @include inline-middle;
+    }
+}
+
+@mixin inline-middle {
+    display: inline-block;
+    vertical-align: middle;
+}
