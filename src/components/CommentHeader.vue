@@ -1,7 +1,11 @@
 <template>
     <div class="comment-header">
         <!-- `喜欢` 部分 -->
-        <span @click="toggleHeart" class="like-item" :class="{ disabled: !store.state.ifLogin }">
+        <span
+            @click="toggleHeart"
+            class="like-item"
+            :class="{ disabled: !store.state.ifLogin, 'vgc-busy': issueHeartLoading }"
+        >
             <!-- loading -->
             <span v-if="issueHeartLoading" class="heart-icon vgc-rotate" v-html="spinnerIcon"></span>
             <!-- heart -->

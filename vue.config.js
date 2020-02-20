@@ -3,6 +3,7 @@ module.exports = {
     productionSourceMap: false,
     configureWebpack: {
         output: {
+            library: 'VueGitComment',
             libraryExport: 'default'
         }
     },

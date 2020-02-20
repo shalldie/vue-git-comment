@@ -27,7 +27,11 @@
                             <span
                                 @click="toggleHeart(index)"
                                 class="cim-heart-item"
-                                :class="{ liked: heartMap[index], disabled: !store.state.ifLogin }"
+                                :class="{
+                                    liked: heartMap[index],
+                                    disabled: !store.state.ifLogin,
+                                    'vgc-busy': item.heartLoading
+                                }"
                             >
                                 <!-- heart 的icon -->
                                 <span v-if="!item.heartLoading" class="cim-heart-icon" v-html="heartIcon"></span>

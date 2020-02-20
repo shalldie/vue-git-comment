@@ -40,9 +40,13 @@ export default class VueGitComment extends Vue {
     /**
      * 当配置更新，重新初始化组件
      */
-    @Watch('options', { deep: true, immediate: true })
+    @Watch('options', { deep: true })
     handleOptionsChange(options: StateStore['options']) {
         gitComment.init(options);
+    }
+
+    mounted() {
+        this.options && this.handleOptionsChange(this.options);
     }
 }
 </script>
@@ -73,6 +77,11 @@ export default class VueGitComment extends Vue {
     :disabled,
     .disabled {
         cursor: not-allowed !important;
+    }
+
+    // busy
+    .vgc-busy {
+        cursor: wait !important;
     }
 
     // 转动效果

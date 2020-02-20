@@ -9,19 +9,10 @@ cd $BASE_PATH
 
 # 删除旧的产出
 rm -rf dist
-rm -rf temp
 
 # 构建
 npm run vue-build
 
-mv dist temp
-
-mkdir dist
-
-cp temp/VueGitComment.umd.js dist/vue-git-comment.js
-cp temp/VueGitComment.umd.min.js dist/vue-git-comment.min.js
-cp temp/VueGitComment.css dist/vue-git-comment.css
-
-rm -rf temp
+rm dist/demo.html
 
 echo "... build done ..."

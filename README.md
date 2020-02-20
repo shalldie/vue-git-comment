@@ -1,16 +1,14 @@
 # vue-git-comment
 
-[![npm][npm_version_image]][npm_version_url] ![Github file size](https://img.shields.io/github/size/shalldie/vue-git-comment/dist/vue-git-comment.js.svg)
-
-Fork from [GitHub](https://github.com/shalldie/vue-git-comment)
-
-Have a look at [Demo](https://shalldie.github.io/demos/vue-git-comment/)
-
-## Description
+[![npm][npm_image]][npm_url] [![travis][travis_image]][travis_url] [![gzip][gzip_image]][gzip_url]
 
 这是一个基于 `github issues` 和 `vue` 的纯前端评论组件，不需要后端。
 
-## Install
+## Live Demo
+
+Have a look at [Demo](https://shalldie.github.io/demos/vue-git-comment/)
+
+## Installation
 
 link:
 
@@ -18,7 +16,7 @@ link:
 <script src="lib/vue.js"></script>
 
 <link href="dist/vue-git-comment.css" rel="stylesheet" />
-<script src="dist/vue-git-comment.js"></script>
+<script src="dist/vue-git-comment.umd.min.js"></script>
 ```
 
 npm:
@@ -74,13 +72,14 @@ export default {
 
 评论系统基于 `github api` ， 需要 [去申请](https://github.com/settings/applications/new) 一个 `OAuth application`。
 
-| Name          |   Type   | Required | Description                                |
-| :------------ | :------: | :------: | :----------------------------------------- |
-| client_id     | `String` |  `true`  | 申请的 client_id                           |
-| client_secret | `String` |  `true`  | 申请的 client_secret                       |
-| owner         | `String` |  `true`  | issue 所在仓库的所有者                     |
-| repo          | `String` |  `true`  | 仓库名称                                   |
-| uuid          | `String` |  `true`  | 用于区分文章的唯一标识，每个评论间不能重复 |
+| Name          |   Type   | Required | Description                                   |
+| :------------ | :------: | :------: | :-------------------------------------------- |
+| client_id     | `String` |  `true`  | 申请的 client_id                              |
+| client_secret | `String` |  `true`  | 申请的 client_secret                          |
+| owner         | `String` |  `true`  | issue 所在仓库的所有者                        |
+| repo          | `String` |  `true`  | 仓库名称                                      |
+| uuid          | `String` |  `true`  | 用于区分文章的唯一标识，每个评论间不能重复    |
+| title         | `String` | `false`  | issue 使用的标题，选填。 默认使用当前页面标题 |
 
 ## Similar Project
 
@@ -101,40 +100,26 @@ export default {
     2.  在移动端上稍微不太友好。
     3.  不能倒序。
     4.  不少请求都存在缓存，数据更新不及时。
-    5.  作者好像没有精力去维护了。
+    5.  作者很久没有维护了。
 
 gitalk 我也特地去了解了一哈，也是非常优秀的一个项目。但是，
 
     1.  体积蛮大，gzip 后 60k，这个用了 preact 没办法。
     2.  没有分页。
-    3.  登陆后用的 `graphql` 去查询，这个能省好多流量！
-
-        然后我就要说“但是”了 hh。 实际上测试，这个并不能加快速度。
-        graphql 的速度跟 restful 接口的速度差不多，但是会有个 options 请求，也就是说请求时间会 `x2`。
-        而 `restful` 有办法可以避免。
-        并不是说 `graphql` 不好，只是我需要分页，所以用这个并不是最优解。
+    3.  登陆后用的 `graphql` 去查询，这个能省好多流量。但是实际速度并没有提升。
 
 综上所述，在学习了 2 个项目的部分代码之后，决定自己搞个。
 
     1.  通过一些算法实现倒序分页。
     2.  利用一些方式避免了 options 请求，加快速度。
     3.  体积不大，对于 vue 项目来说能省不少。
-    4.  想要更稳定、成熟的方案，建议去用 gitment 和 gitalk 吧。
-
-        毕竟这个项目刚做好，这么优秀的项目，就让我一个人用好了 0_o
+    4.  想要更稳定、成熟的方案，建议去用 gitment 或 gitalk。
 
 ## Enjoy it! >\_<#@!
 
-[npm_version_image]: https://img.shields.io/npm/v/vue-git-comment.svg
-[npm_version_url]: https://www.npmjs.com/package/vue-git-comment
-
-[cdnjs-version-image]: https://img.shields.io/cdnjs/v/gitalk.svg?style=flat-square
-[cdnjs-version-url]: https://cdnjs.com/libraries/gitalk
-[david-dm-image]: https://david-dm.org/gitalk/gitalk.svg?style=flat-square
-[david-dm-url]: https://david-dm.org/gitalk/gitalk
-[travis-image]: https://img.shields.io/travis/gitalk/gitalk/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/gitalk/gitalk
-[coveralls-image]: https://img.shields.io/coveralls/gitalk/gitalk/master.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/github/gitalk/gitalk
-[gzip-size]: http://img.badgesize.io/https://unpkg.com/gitalk/dist/gitalk.min.js?compression=gzip&style=flat-square
-[gzip-url]: https://unpkg.com/gitalk/dist/gitalk.min.js
+[npm_image]: https://img.shields.io/npm/v/vue-git-comment.svg
+[npm_url]: https://www.npmjs.com/package/vue-git-comment
+[travis_image]: https://img.shields.io/travis/shalldie/vue-git-comment/master.svg
+[travis_url]: https://travis-ci.org/shalldie/vue-git-comment
+[gzip_image]: https://img.badgesize.io/https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.9/dist/vue-git-comment.umd.min.js?compression=gzip
+[gzip_url]: https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.9/dist/vue-git-comment.umd.min.js
