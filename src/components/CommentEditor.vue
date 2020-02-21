@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, InjectReactive, Watch } from 'vue-property-decorator';
+import { Component, Vue, Inject, Watch } from 'vue-property-decorator';
 import { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 import { githubIcon, spinnerIcon } from '../lib/icons';
@@ -77,7 +77,7 @@ export default class CommentEditor extends Vue {
 
     cacheList: { content: string; preview: string }[] = [];
 
-    @InjectReactive()
+    @Inject()
     store!: StateStore;
 
     getCache(content) {
@@ -191,14 +191,17 @@ $TAB_HEIGHT: 40px;
                 // tab
                 .ce-tab-item {
                     height: $TAB_HEIGHT;
-                    margin-top: -1px;
                     padding: 0 12px;
                     cursor: pointer;
                     border: 1px solid transparent;
 
+                    &:nth-child(1) {
+                        border-left: none;
+                        border-right: none;
+                    }
+
                     &:nth-child(2) {
                         border-left-color: $BORDER_COLOR;
-                        margin-left: -1px;
                     }
 
                     &.active {
@@ -210,7 +213,7 @@ $TAB_HEIGHT: 40px;
                 // login,logout
                 .login-link-btn,
                 .logout-link {
-                    margin: -1px 12px 0 auto;
+                    margin: 0 12px 0 auto;
                 }
 
                 .login-link-btn {
@@ -245,6 +248,7 @@ $TAB_HEIGHT: 40px;
                     color: #333;
                     border: none;
                     margin: 0;
+                    background: $BG_COLOR;
                 }
                 .ce-preview {
                     min-height: 150px;

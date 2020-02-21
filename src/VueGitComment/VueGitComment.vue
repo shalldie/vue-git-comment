@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch, ProvideReactive } from 'vue-property-decorator';
+import { Component, Vue, Prop, Watch, Provide } from 'vue-property-decorator';
 import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 import CommentHeader from '@/components/CommentHeader.vue';
@@ -34,7 +34,7 @@ export default class VueGitComment extends Vue {
     /**
      * 全局store
      */
-    @ProvideReactive()
+    @Provide()
     store = store;
 
     /**

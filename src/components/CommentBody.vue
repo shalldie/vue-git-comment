@@ -40,7 +40,12 @@
                                 <span class="cim-heart-num">{{ item.likedList.length || '' }}</span>
                             </span>
                             <!-- reply -->
-                            <span @click="handleReply(item)" class="cim-reply-item" v-html="replyIcon"></span>
+                            <span
+                                @click="handleReply(item)"
+                                :class="{ disabled: !store.state.ifLogin }"
+                                class="cim-reply-item"
+                                v-html="replyIcon"
+                            ></span>
                         </div>
                     </div>
                     <div class="cim-body" v-html="item.body_html"></div>
@@ -51,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import { Component, Vue, Inject } from 'vue-property-decorator';
 import { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 import { heartIcon, spinnerIcon, replyIcon } from '../lib/icons';
@@ -66,7 +71,7 @@ export default class CommentBody extends Vue {
 
     creating = false;
 
-    @InjectReactive()
+    @Inject()
     store!: StateStore;
 
     /**
@@ -119,6 +124,10 @@ export default class CommentBody extends Vue {
     }
 
     handleReply(item: StateStore['comments']['list'][number]) {
+        if (!this.store.state.ifLogin) {
+            return;
+        }
+
         const content = [`@${item.user.name}`, ...item.body.split('\n')].map(line => `> ${line}`).join('\n') + '\n';
         const editor = this.$parent.$refs.editor as CommentEditor;
         editor.showArea = true;
@@ -264,7 +273,7 @@ export default class CommentBody extends Vue {
                                     height: 16px;
                                 }
 
-                                &:hover svg {
+                                &:not(.disabled):hover svg {
                                     fill: $LINK_COLOR;
                                 }
                             }

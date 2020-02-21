@@ -22,9 +22,7 @@
             <strong>{{ store.comments.count }}</strong>
             <span> Comments</span>
         </a>
-        <!-- issue page -->
-        <!-- <a class="issue-link" :href="store.issue.url" target="_blank">Issue Page</a> -->
-
+        <!-- 排序 -->
         <div class="sort-item-wrap">
             <strong @click="changeSort(false)" :class="{ active: !store.comments.sortedAsc }" class="sort-item">
                 Latest
@@ -38,7 +36,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import { Component, Vue, Inject } from 'vue-property-decorator';
 import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 import { heartIcon, spinnerIcon } from '../lib/icons';
@@ -52,7 +50,7 @@ export default class CommentHeader extends Vue {
 
     issueHeartLoading = false; // issue heart 是否在请求中
 
-    @InjectReactive()
+    @Inject()
     store!: StateStore;
 
     get liked(): boolean {
@@ -60,7 +58,7 @@ export default class CommentHeader extends Vue {
     }
 
     toggleHeart() {
-        if (this.issueHeartLoading) {
+        if (!this.store.state.ifLogin || this.issueHeartLoading) {
             return;
         }
 

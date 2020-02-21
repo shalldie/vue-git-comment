@@ -17,13 +17,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, InjectReactive } from 'vue-property-decorator';
+import { Component, Vue, Inject } from 'vue-property-decorator';
 import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 
 @Component
 export default class CommentPagination extends Vue {
-    @InjectReactive()
+    @Inject()
     store!: StateStore;
 
     get pageCount() {
