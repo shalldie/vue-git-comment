@@ -36,19 +36,14 @@ class GitComment {
      */
     private tryHandleBack(): Promise<void> {
         // 校验是否是从github跳转过来
-        if (getQuery('state') !== IDENTITY_STATE) {
-            return Promise.resolve();
-        }
+
+        const state = getQuery('state');
         const code = getQuery('code');
-        if (!code) {
+        if (!code || !state) {
             return Promise.resolve();
         }
 
-        const replaceUrl = window.location.href
-            .replace(/(code|state)=[^&]*/g, '') // 去掉 code,state 的query
-            .replace(/&*$/, '') // 去掉末尾可能的 &
-            .replace(/\?/, ''); // 去掉末尾可能的 ?
-        window.history.replaceState(null, '', replaceUrl);
+        window.history.replaceState(null, '', decodeURIComponent(state));
 
         store.comments.loading = true;
         return github

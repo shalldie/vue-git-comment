@@ -1,7 +1,7 @@
 import { appendQuery } from './utils';
 import store from './store';
 import http from './http';
-import { IDENTITY_STATE, ISSUE_LABELS } from './constants';
+import { ISSUE_LABELS } from './constants';
 
 /**
  * 组件的通用凭证
@@ -39,7 +39,7 @@ export function toAuthorize(): void {
         client_id: store.options.client_id,
         redirect_uri: window.location.href,
         scope: 'public_repo',
-        state: IDENTITY_STATE
+        state: window.location.href
     });
     window.location.href = url;
 }

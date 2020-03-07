@@ -1223,7 +1223,7 @@ function appendQuery(url, query) {
 
 function getQuery(key) {
   var url = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : window.location.href;
-  var reg = new RegExp("".concat(key, "=([^&]*)"));
+  var reg = new RegExp("".concat(key, "=([^&#]*)"));
   var matches = url.match(reg);
 
   if (matches && matches.length) {
@@ -1516,7 +1516,7 @@ function toAuthorize() {
     client_id: store.options.client_id,
     redirect_uri: window.location.href,
     scope: 'public_repo',
-    state: IDENTITY_STATE
+    state: window.location.href
   });
   window.location.href = url;
 }
@@ -1891,21 +1891,14 @@ function () {
       var _this2 = this;
 
       // 校验是否是从github跳转过来
-      if (getQuery('state') !== IDENTITY_STATE) {
-        return Promise.resolve();
-      }
-
+      var state = getQuery('state');
       var code = getQuery('code');
 
-      if (!code) {
+      if (!code || !state) {
         return Promise.resolve();
       }
 
-      var replaceUrl = window.location.href.replace(/(code|state)=[^&]*/g, '') // 去掉 code,state 的query
-      .replace(/&*$/, '') // 去掉末尾可能的 &
-      .replace(/\?/, ''); // 去掉末尾可能的 ?
-
-      window.history.replaceState(null, '', replaceUrl);
+      window.history.replaceState(null, '', decodeURIComponent(state));
       store.comments.loading = true;
       return getToken(code).then(function (token) {
         store.access_token = token;

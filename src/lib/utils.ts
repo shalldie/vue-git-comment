@@ -40,7 +40,7 @@ export function appendQuery(url: string, query: any): string {
  * @returns {string}
  */
 export function getQuery(key: string, url: string = window.location.href): string {
-    const reg = new RegExp(`${key}=([^&]*)`);
+    const reg = new RegExp(`${key}=([^&#]*)`);
     const matches = url.match(reg);
     if (matches && matches.length) {
         return matches[1];
