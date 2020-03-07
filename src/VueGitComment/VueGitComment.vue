@@ -64,7 +64,6 @@ export default class VueGitComment extends Vue {
 }
 
 .vue-git-comment {
-    background: $BG_COLOR;
     color: #333;
     font-family: sans-serif;
 
@@ -94,16 +93,17 @@ export default class VueGitComment extends Vue {
         &::after {
             content: '';
             position: absolute;
-            border: 8px solid transparent;
-            border-right-color: $BORDER_COLOR;
-            right: 100%;
-            top: 6px;
         }
 
-        &::after {
-            border-width: 7px;
-            border-right-color: $BG_COLOR;
-            top: 7px;
+        &::before {
+            width: 10px;
+            height: 10px;
+            left: -6px;
+            top: 10px;
+            transform: rotate(45deg);
+            border: 1px solid #ddd;
+            border-width: 0 0 1px 1px;
+            background: #fff;
         }
     }
     a {

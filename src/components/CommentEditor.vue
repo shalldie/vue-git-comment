@@ -17,11 +17,13 @@
             <div class="ce-header border-arrow">
                 <div @click="showArea = true" :class="{ active: showArea }" class="ce-tab-item">Write</div>
                 <div @click="showArea = false" :class="{ active: !showArea }" class="ce-tab-item">Preview</div>
-                <div v-if="!store.state.ifLogin" class="login-link-btn">
-                    <a @click="login" href="javascript:void(0)">Login</a>
-                    <span> with Github</span>
+                <div class="login-wrap">
+                    <template v-if="!store.state.ifLogin">
+                        <a @click="login" href="javascript:void(0)">Login</a>
+                        <span> with Github</span>
+                    </template>
+                    <span v-else @click="logOut" class="logout-link">Logout</span>
                 </div>
-                <span v-else @click="logOut" class="logout-link">Logout</span>
             </div>
             <div class="ce-body">
                 <textarea
@@ -186,6 +188,7 @@ $TAB_HEIGHT: 40px;
                 height: $TAB_HEIGHT;
                 line-height: $TAB_HEIGHT;
                 border: 1px solid $BORDER_COLOR;
+                border-bottom-color: transparent;
                 @include flex;
 
                 // tab
@@ -198,35 +201,39 @@ $TAB_HEIGHT: 40px;
                     &:nth-child(1) {
                         border-left: none;
                         border-right: none;
+                        border-bottom-color: $BORDER_COLOR;
                     }
 
                     &:nth-child(2) {
                         border-left-color: $BORDER_COLOR;
+                        border-bottom-color: $BORDER_COLOR;
                     }
 
                     &.active {
                         border-right-color: $BORDER_COLOR;
-                        border-bottom-color: $BG_COLOR;
+                        border-bottom-color: transparent;
                     }
                 }
 
                 // login,logout
-                .login-link-btn,
-                .logout-link {
-                    margin: 0 12px 0 auto;
-                }
+                .login-wrap {
+                    @include flex-item;
+                    padding-right: 12px;
+                    text-align: right;
+                    // margin-left: auto;
+                    border-top: 1px solid transparent;
+                    border-bottom: 1px solid $BORDER_COLOR;
+                    line-height: $TAB_HEIGHT - 2;
 
-                .login-link-btn {
-                    cursor: default;
                     a {
                         text-decoration: none;
                     }
-                }
 
-                .logout-link {
-                    &:hover {
-                        cursor: pointer;
-                        color: $LINK_COLOR;
+                    .logout-link {
+                        &:hover {
+                            cursor: pointer;
+                            color: $LINK_COLOR;
+                        }
                     }
                 }
             }
@@ -248,7 +255,7 @@ $TAB_HEIGHT: 40px;
                     color: #333;
                     border: none;
                     margin: 0;
-                    background: $BG_COLOR;
+                    background: transparent;
                 }
                 .ce-preview {
                     min-height: 150px;

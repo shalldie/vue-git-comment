@@ -1,5 +1,9 @@
 <template>
     <div id="app">
+        <button @click="toggleBgcolor" style="padding: 4px;">toggle backgroundColor</button>
+        <br />
+        <br />
+        <br />
         <VueGitComment :options="options" />
     </div>
 </template>
@@ -23,6 +27,15 @@ export default class App extends Vue {
         repo: 'gitment-store',
         uuid: 'esaffeffdfdsaflgfdjsae'
     };
+
+    toggleBgcolor() {
+        const body = document.body;
+        if (body.hasAttribute('style')) {
+            body.removeAttribute('style');
+            return;
+        }
+        body.setAttribute('style', 'background: #f8f8f8');
+    }
 }
 </script>
 
@@ -31,6 +44,7 @@ html,
 body {
     margin: 0;
     padding: 0;
+    background: #fff;
 }
 #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
