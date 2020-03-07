@@ -1,6 +1,6 @@
 import store, { StateStore } from './store';
 import { getQuery, reversePageMatch, addTargetBlank, dateFormat } from './utils';
-import { IDENTITY_STATE, GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
+import { GIT_COMMENT_ACCESS_STOKEN, ISSUE_LABELS, ISSUE_BODY } from './constants';
 import * as github from './github';
 import Deferred from './Deferred';
 

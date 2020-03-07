@@ -1366,11 +1366,6 @@ var ISSUE_LABELS = ['vue-git-comment'];
  */
 
 var ISSUE_BODY = 'this issue is made by: https://github.com/shalldie/vue-git-comment';
-/**
- * 用户登陆跳转时带的 state
- */
-
-var IDENTITY_STATE = 'IDENTITY_STATE';
 // CONCATENATED MODULE: ./src/lib/Deferred.ts
 function Deferred_classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
