@@ -21,9 +21,15 @@ export class StateStore {
         repo: '',
 
         uuid: '',
-        /** 标题，可选，最多20字 */
+
+        /** 可选属性 */
         ...(() => {
-            return { title: '' } as { title?: string };
+            const optional = {
+                title: '', // 标题，可选，最多20字
+                language: 'en' as 'en' | 'zh-CN' // 国际化
+            };
+
+            return optional as Partial<typeof optional>;
         })()
     };
 

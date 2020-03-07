@@ -2,9 +2,9 @@
     <div class="comment-body">
         <div v-if="creating">Creating...</div>
         <div v-else-if="!store.issue.created && store.options.owner === store.userInfo.name">
-            Seems new,
-            <a @click="createIssue" href="javascript:void(0)">Click</a>
-            to create an issue.
+            {{ i('Seems new,') }}
+            <a @click="createIssue" href="javascript:void(0)">{{ i('Click') }}</a>
+            {{ i('to create an issue.') }}
         </div>
         <div v-else-if="store.comments.loading" class="comment-loading" v-html="spinnerIcon"></div>
         <div v-else class="comment-list">
@@ -18,7 +18,7 @@
                         <!-- 评论信息部分 -->
                         <div class="cim-info-wrap">
                             <a class="cim-name" target="_blank" :href="item.user.link">{{ item.user.name }}</a>
-                            <span class="cim-time"> commented on </span>
+                            <span class="cim-time"> {{ i('commented on') }} </span>
                             <span class="cim-time">{{ item.created_at }}</span>
                         </div>
                         <!-- 评论的反馈 reaction -->
@@ -62,9 +62,12 @@ import gitComment from '../lib/gitComment';
 import { heartIcon, spinnerIcon, replyIcon } from '../lib/icons';
 import * as github from '../lib/github';
 import CommentEditor from './CommentEditor.vue';
+import i18n from '../lib/i18n';
 
 @Component
 export default class CommentBody extends Vue {
+    i = i18n;
+
     heartIcon = heartIcon;
     spinnerIcon = spinnerIcon;
     replyIcon = replyIcon;
@@ -196,7 +199,7 @@ export default class CommentBody extends Vue {
                         // 评论信息概要
                         .cim-info-wrap {
                             @include flex-item;
-                            margin-right: 15px;
+                            margin-right: 20px;
                             // @include flex;
 
                             .cim-name {
@@ -213,6 +216,7 @@ export default class CommentBody extends Vue {
                             .cim-time {
                                 color: #666;
                                 font-size: 14px;
+                                // white-space: nowrap;
                                 // margin-right: 30px;
                             }
                         }

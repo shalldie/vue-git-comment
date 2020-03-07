@@ -25,7 +25,8 @@ export default class App extends Vue {
         client_secret: '80714a6e5a35b36043a5dfbd15d43795e95aaa9b',
         owner: 'shalldie',
         repo: 'gitment-store',
-        uuid: 'esaffeffdfdsaflgfdjsae'
+        uuid: 'esaffffdfdsaflgfdjsa',
+        language: 'zh-CN'
     };
 
     toggleBgcolor() {

@@ -50,6 +50,7 @@ class GitComment {
             .replace(/\?/, ''); // 去掉末尾可能的 ?
         window.history.replaceState(null, '', replaceUrl);
 
+        store.comments.loading = true;
         return github
             .getToken(code)
             .then(token => {
@@ -59,6 +60,9 @@ class GitComment {
             .catch(ex => {
                 console.log(ex);
                 this.logOut();
+            })
+            .finally(() => {
+                store.comments.loading = false;
             });
     }
 

@@ -12,7 +12,7 @@
             <span v-else :class="{ liked: liked }" class="heart-icon" v-html="heartIcon"></span>
             <span class="heart-txt">
                 <strong>{{ store.issue.likedList.length }}</strong>
-                <span> Liked</span>
+                <span> {{ i('Liked') }}</span>
             </span>
         </span>
         <!-- 分割点 -->
@@ -20,16 +20,16 @@
         <!-- 评论数 -->
         <a :href="store.issue.html_url" target="_blank" class="comment-num">
             <strong>{{ store.comments.count }}</strong>
-            <span> Comments</span>
+            <span> {{ i('Comments') }}</span>
         </a>
         <!-- 排序 -->
         <div class="sort-item-wrap">
             <strong @click="changeSort(false)" :class="{ active: !store.comments.sortedAsc }" class="sort-item">
-                Latest
+                {{ i('Latest') }}
             </strong>
             <strong class="split-point">•</strong>
             <strong @click="changeSort(true)" :class="{ active: store.comments.sortedAsc }" class="sort-item">
-                Earliest
+                {{ i('Earliest') }}
             </strong>
         </div>
     </div>
@@ -41,9 +41,12 @@ import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
 import { heartIcon, spinnerIcon } from '../lib/icons';
 import * as github from '../lib/github';
+import i18n from '../lib/i18n';
 
 @Component
 export default class CommentHeader extends Vue {
+    i = i18n;
+
     spinnerIcon = spinnerIcon; // loading icon
 
     heartIcon = heartIcon; // heart icon

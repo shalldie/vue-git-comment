@@ -15,14 +15,16 @@
         <!-- 编辑器容器 -->
         <div class="comment-editor-main">
             <div class="ce-header border-arrow">
-                <div @click="showArea = true" :class="{ active: showArea }" class="ce-tab-item">Write</div>
-                <div @click="showArea = false" :class="{ active: !showArea }" class="ce-tab-item">Preview</div>
+                <div @click="showArea = true" :class="{ active: showArea }" class="ce-tab-item">{{ i('Write') }}</div>
+                <div @click="showArea = false" :class="{ active: !showArea }" class="ce-tab-item">
+                    {{ i('Preview') }}
+                </div>
                 <div class="login-wrap">
                     <template v-if="!store.state.ifLogin">
-                        <a @click="login" href="javascript:void(0)">Login</a>
-                        <span> with Github</span>
+                        <a @click="login" href="javascript:void(0)">{{ i('Login') }}</a>
+                        <span> {{ i('with Github') }}</span>
                     </template>
-                    <span v-else @click="logOut" class="logout-link">Logout</span>
+                    <span v-else @click="logOut" class="logout-link">{{ i('Logout') }}</span>
                 </div>
             </div>
             <div class="ce-body">
@@ -32,7 +34,7 @@
                     v-show="showArea"
                     :disabled="!store.state.ifLogin || submitting"
                     class="ce-textarea"
-                    placeholder="Leave a comment."
+                    :placeholder="i('Leave a comment.')"
                 ></textarea>
                 <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
@@ -44,7 +46,7 @@
                 </div>
 
                 <button :disabled="!store.state.ifLogin || submitting" @click="comment" class="ce-comment-btn">
-                    {{ submitting ? 'Submitting ...' : 'Comment' }}
+                    {{ submitting ? `${i('Submitting')} ...` : i('Comment') }}
                 </button>
             </div>
             <div class="ce-power-row">
@@ -62,9 +64,12 @@ import gitComment from '../lib/gitComment';
 import { githubIcon, spinnerIcon } from '../lib/icons';
 import * as github from '../lib/github';
 import { addTargetBlank } from '../lib/utils';
+import i18n from '../lib/i18n';
 
 @Component
 export default class CommentEditor extends Vue {
+    i = i18n;
+
     githubIcon = githubIcon;
 
     spinnerIcon = spinnerIcon;
@@ -75,7 +80,7 @@ export default class CommentEditor extends Vue {
 
     areaContent = '';
 
-    markdownContent = 'Nothing to preview';
+    markdownContent = this.i('Nothing to preview');
 
     cacheList: { content: string; preview: string }[] = [];
 
@@ -121,7 +126,7 @@ export default class CommentEditor extends Vue {
     handleShowAreaChange(ifShowArea: boolean) {
         this.areaContent = this.areaContent.trim();
         if (ifShowArea || !this.areaContent.length) {
-            this.markdownContent = 'Nothing to preview';
+            this.markdownContent = this.i('Nothing to preview');
             return;
         }
 
@@ -133,7 +138,7 @@ export default class CommentEditor extends Vue {
         }
 
         // 从接口获取，并缓存
-        this.markdownContent = 'Loading preview ...';
+        this.markdownContent = this.i('Loading preview ...');
         github.getMarkDown(this.areaContent).then(body => {
             body = addTargetBlank(body);
             this.markdownContent = body;

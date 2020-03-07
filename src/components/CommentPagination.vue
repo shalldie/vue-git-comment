@@ -11,7 +11,7 @@
             {{ index + 1 }}
         </li>
         <li @click="nextPage" :class="{ disabled: store.comments.page >= pageCount }" class="comment-page-item">
-            Next page
+            {{ i('Next page') }}
         </li>
     </ul>
 </template>
@@ -20,9 +20,12 @@
 import { Component, Vue, Inject } from 'vue-property-decorator';
 import store, { StateStore } from '../lib/store';
 import gitComment from '../lib/gitComment';
+import i18n from '../lib/i18n';
 
 @Component
 export default class CommentPagination extends Vue {
+    i = i18n;
+
     @Inject()
     store!: StateStore;
 
