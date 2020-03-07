@@ -2204,7 +2204,7 @@ var languages = {
   },
   // comment body
   'Seems new,': {
-    'zh-CN': '似乎新建的，'
+    'zh-CN': '似乎是新建的，'
   },
   Click: {
     'zh-CN': '点击'
@@ -2239,7 +2239,7 @@ var languages = {
     'zh-CN': '留下一个评论。'
   },
   'Nothing to preview': {
-    'zh-CN': '没有东西可预览'
+    'zh-CN': '没有内容可以预览'
   },
   'Loading preview ...': {
     'zh-CN': '加载预览中 ...'

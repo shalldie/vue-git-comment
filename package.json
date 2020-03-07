@@ -1,6 +1,6 @@
 {
   "name": "vue-git-comment",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A vue's comment component base on github's issues.",
   "main": "dist/vue-git-comment.umd.js",
   "files": [
@@ -23,10 +23,12 @@
   },
   "keywords": [
     "comment",
+    "vue",
+    "github",
     "issue"
   ],
   "author": "shalldie",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/shalldie/vue-git-comment/issues"
   },
