@@ -2,15 +2,19 @@
     <div class="comment-editor">
         <!-- 没登陆，且没loading， 显示github的icon -->
         <span
-            v-if="!store.state.ifLogin && !store.userInfo.loading"
+            v-if="!state.ifLogin && !state.userInfo.loading"
             class="user-avatar user-avatar-github"
-            v-html="githubIcon"
+            v-html="icons.githubIcon"
         ></span>
         <!-- 正在登陆的适合，显示 loading -->
-        <span v-else-if="store.userInfo.loading" class="user-avatar user-avatar-loading" v-html="spinnerIcon"></span>
+        <span
+            v-else-if="state.userInfo.loading"
+            class="user-avatar user-avatar-loading"
+            v-html="icons.spinnerIcon"
+        ></span>
         <!-- 其它，登陆的情况下 -->
-        <a v-else :href="store.userInfo.html_url" target="_blank">
-            <img class="user-avatar user-avatar-img" :src="store.userInfo.avatar_url" />
+        <a v-else :href="state.userInfo.htmlUrl" target="_blank">
+            <img class="user-avatar user-avatar-img" :src="state.userInfo.avatarUrl" />
         </a>
         <!-- 编辑器容器 -->
         <div class="comment-editor-main">
@@ -20,7 +24,7 @@
                     {{ i('Preview') }}
                 </div>
                 <div class="login-wrap">
-                    <template v-if="!store.state.ifLogin">
+                    <template v-if="!state.ifLogin">
                         <a @click="login" href="javascript:void(0)">{{ i('Login') }}</a>
                         <span> {{ i('with Github') }}</span>
                     </template>
@@ -32,7 +36,7 @@
                     ref="editor"
                     v-model="areaContent"
                     v-show="showArea"
-                    :disabled="!store.state.ifLogin || submitting"
+                    :disabled="!state.ifLogin || submitting"
                     class="ce-textarea"
                     :placeholder="i('Leave a comment.')"
                 ></textarea>
@@ -45,7 +49,7 @@
                     </a>
                 </div>
 
-                <button :disabled="!store.state.ifLogin || submitting" @click="comment" class="ce-comment-btn">
+                <button :disabled="!state.ifLogin || submitting" @click="comment" class="ce-comment-btn">
                     {{ submitting ? `${i('Submitting')} ...` : i('Comment') }}
                 </button>
             </div>
@@ -58,34 +62,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Inject, Watch } from 'vue-property-decorator';
-import { StateStore } from '../lib/store';
-import gitComment from '../lib/gitComment';
-import { githubIcon, spinnerIcon } from '../lib/icons';
-import * as github from '../lib/github';
-import { addTargetBlank } from '../lib/utils';
-import i18n from '../lib/i18n';
+import { Watch, Component, BaseComponent } from '~/lib/decorators';
+import * as github from '~/lib/github';
+import { addTargetBlank } from '~/lib/utils';
+import { gm } from '~/lib/gitcomment';
+import { i18n } from '~/lib/i18n';
 
 @Component
-export default class CommentEditor extends Vue {
-    i = i18n;
-
-    githubIcon = githubIcon;
-
-    spinnerIcon = spinnerIcon;
-
+export default class CommentHeader extends BaseComponent {
     showArea = true; // 是否展示 textarea
 
     submitting = false;
 
     areaContent = '';
 
-    markdownContent = this.i('Nothing to preview');
+    markdownContent = i18n('Nothing to preview');
 
     cacheList: { content: string; preview: string }[] = [];
-
-    @Inject()
-    store!: StateStore;
 
     getCache(content) {
         const item = this.cacheList.find(n => n.content === content);
@@ -102,28 +95,28 @@ export default class CommentEditor extends Vue {
     }
 
     login() {
-        gitComment.login();
+        gm.logIn();
     }
 
     logOut() {
-        gitComment.logOut();
+        gm.logOut();
     }
 
-    comment() {
-        if (this.areaContent.trim().length <= 0) {
+    async comment() {
+        if (!this.areaContent.trim().length) {
             return;
         }
         this.submitting = true;
-        github.createComment(this.areaContent).then(() => {
-            this.areaContent = '';
-            this.submitting = false;
-            this.showArea = true;
-            return gitComment.getCurrentPage(true);
-        });
+
+        await github.createComment(this.areaContent);
+        this.areaContent = '';
+        this.submitting = false;
+        this.showArea = true;
+        return gm.fetchCurrentPage(true);
     }
 
     @Watch('showArea')
-    handleShowAreaChange(ifShowArea: boolean) {
+    async handleShowAreaChange(ifShowArea: boolean) {
         this.areaContent = this.areaContent.trim();
         if (ifShowArea || !this.areaContent.length) {
             this.markdownContent = this.i('Nothing to preview');
@@ -139,11 +132,11 @@ export default class CommentEditor extends Vue {
 
         // 从接口获取，并缓存
         this.markdownContent = this.i('Loading preview ...');
-        github.getMarkDown(this.areaContent).then(body => {
-            body = addTargetBlank(body);
-            this.markdownContent = body;
-            this.addCache(this.areaContent, body);
-        });
+
+        const result = await github.getMarkDown(this.areaContent);
+        const body = addTargetBlank(result);
+        this.markdownContent = body;
+        this.addCache(this.areaContent, body);
     }
 }
 </script>

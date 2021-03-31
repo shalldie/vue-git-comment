@@ -8,13 +8,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch, Provide } from 'vue-property-decorator';
-import store, { StateStore } from '../lib/store';
-import gitComment from '../lib/gitComment';
-import CommentHeader from '@/components/CommentHeader.vue';
-import CommentBody from '@/components/CommentBody.vue';
-import CommentPagination from '@/components/CommentPagination.vue';
-import CommentEditor from '@/components/CommentEditor.vue';
+import { Component, Prop, Watch, BaseComponent } from '~/lib/decorators';
+import CommentHeader from '~/components/CommentHeader.vue';
+import CommentBody from '~/components/CommentBody.vue';
+import CommentPagination from '~/components/CommentPagination.vue';
+import CommentEditor from '~/components/CommentEditor.vue';
+import { gm } from '~/lib/gitcomment';
+import { TOptions } from '~/lib/store';
 
 @Component({
     components: {
@@ -24,25 +24,19 @@ import CommentEditor from '@/components/CommentEditor.vue';
         CommentEditor
     }
 })
-export default class VueGitComment extends Vue {
+export default class VueGitComment extends BaseComponent {
     /**
      * 组件配置
      */
     @Prop()
-    private options!: StateStore['options'];
-
-    /**
-     * 全局store
-     */
-    @Provide()
-    store = store;
+    options!: TOptions;
 
     /**
      * 当配置更新，重新初始化组件
      */
     @Watch('options', { deep: true })
-    handleOptionsChange(options: StateStore['options']) {
-        gitComment.init(options);
+    handleOptionsChange(options: TOptions) {
+        gm.init(options);
     }
 
     mounted() {
@@ -52,8 +46,6 @@ export default class VueGitComment extends Vue {
 </script>
 
 <style lang="scss">
-@import '../assets/styles/github-markdown.css';
-
 @keyframes vue-git-comment-rotate {
     from {
         transform: rotate(0);

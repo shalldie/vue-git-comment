@@ -1,7 +1,10 @@
 import { appendQuery } from './utils';
-import store from './store';
-import http from './http';
+import { store } from '~/lib/store';
+import { http } from './http';
 import { ISSUE_LABELS } from './constants';
+
+// Media Types
+// https://docs.github.com/en/rest/overview/media-types
 
 /**
  * 组件的通用凭证
@@ -9,9 +12,9 @@ import { ISSUE_LABELS } from './constants';
  * @returns
  */
 function basicAuthHeader() {
-    const { client_id, client_secret } = store.options;
+    const { clientID, clientSecret } = store.state.options;
     return {
-        Authorization: 'Basic ' + btoa(`${client_id}:${client_secret}`)
+        Authorization: 'Basic ' + btoa(`${clientID}:${clientSecret}`)
     };
 }
 
@@ -22,7 +25,7 @@ function basicAuthHeader() {
  */
 function tokenAuthHeader() {
     return {
-        Authorization: `token ${store.access_token}`
+        Authorization: `token ${store.state.accessToken}`
     };
 }
 
@@ -36,7 +39,7 @@ function tokenAuthHeader() {
 export function toAuthorize(): void {
     let url = 'https://github.com/login/oauth/authorize';
     url = appendQuery(url, {
-        client_id: store.options.client_id,
+        client_id: store.state.options.clientID,
         redirect_uri: window.location.href,
         scope: 'public_repo',
         state: window.location.href
@@ -52,23 +55,26 @@ export function toAuthorize(): void {
  * @returns {Promise<string>}
  */
 export function getToken(code: string): Promise<string> {
-    const { client_id, client_secret } = store.options;
+    const { clientID, clientSecret, proxy } = store.state.options;
+
+    // https://github.com/login/oauth/access_token
 
     return http
         .fetch({
             method: 'POST',
-            url: 'https://cors-anywhere.herokuapp.com/https://github.com/login/oauth/access_token',
+            url: proxy!,
             params: {
-                client_id,
-                client_secret,
+                client_id: clientID,
+                client_secret: clientSecret,
                 code
             }
         })
-        .then((body: any) => body.access_token);
+        .then(body => body.access_token);
 }
 
 /**
  * 获取当前用户信息
+ * https://docs.github.com/en/rest/reference/users#get-the-authenticated-user
  *
  * @export
  * @returns
@@ -77,7 +83,10 @@ export function getAuthUser() {
     return http.fetch({
         method: 'GET',
         url: '/user',
-        headers: tokenAuthHeader(),
+        headers: {
+            ...tokenAuthHeader(),
+            Accept: 'application/vnd.github.v3+json'
+        },
         query: {
             _: Math.random()
         }
@@ -90,7 +99,7 @@ export function getAuthUser() {
 
 /**
  * 创建一个 issue
- * https://developer.github.com/v3/issues/#create-an-issue
+ * https://docs.github.com/en/rest/reference/issues#create-an-issue
  *
  * @export
  * @param {string[]} labels
@@ -99,7 +108,7 @@ export function getAuthUser() {
  * @returns
  */
 export function createIssue(labels: string[], title: string, body: string) {
-    const { owner, repo } = store.options;
+    const { owner, repo } = store.state.options;
     return http.fetch({
         method: 'POST',
         url: `/repos/${owner}/${repo}/issues`,
@@ -109,45 +118,55 @@ export function createIssue(labels: string[], title: string, body: string) {
 }
 
 /**
+ * todo: check
  * 获取第一个 issue 相关信息
+ * https://docs.github.com/en/rest/reference/issues#list-repository-issues
  *
  * @export
- * @returns {Promise<{ comments: number; number: number; html_url: string }>}
+ * @returns {Promise<{ comments: number; number: number; htmlUrl: string }>}
  */
-export function getFirstIssue(): Promise<{ comments: number; number: number; html_url: string }> {
-    const { owner, repo, uuid } = store.options;
+export function getFirstIssue(): Promise<{ comments: number; number: number; htmlUrl: string }> {
+    const { owner, repo, uuid } = store.state.options;
     const labels = [uuid, ...ISSUE_LABELS].join(',');
 
     return http
         .fetch<{ comments: number; number: number; html_url: string }[]>({
             method: 'GET',
             url: `/repos/${owner}/${repo}/issues`,
-            headers: basicAuthHeader(),
+            headers: {
+                ...basicAuthHeader(),
+                Accept: 'application/vnd.github.v3+json'
+            },
             query: {
                 creator: owner,
                 labels,
                 _: Math.random()
             }
         })
+        .then(list =>
+            list.map(n => ({
+                ...n,
+                htmlUrl: n.html_url
+            }))
+        )
         .then(list => list[0]);
 }
 
 /**
  * 获取 issue 对应的 reactions
+ * https://docs.github.com/en/rest/reference/reactions#list-reactions-for-an-issue
  *
  * @export
  * @returns
  */
 export function issueReactions() {
-    const { owner, repo } = store.options;
-    const number = store.issue.number;
+    const { owner, repo } = store.state.options;
+    const number = store.state.issue.number;
     return http.fetch({
         method: 'GET',
         url: `/repos/${owner}/${repo}/issues/${number}/reactions`,
         headers: {
             ...basicAuthHeader(),
-            // 获取 issue 信息的时候带上 reactions
-            // https://developer.github.com/v3/reactions/#list-reactions-for-an-issue
             Accept: 'application/vnd.github.squirrel-girl-preview+json'
         },
         query: {
@@ -162,13 +181,14 @@ export function issueReactions() {
 
 /**
  * 创建评论
+ * https://docs.github.com/en/rest/reference/issues#create-an-issue-comment
  *
  * @export
  * @param {string} body
  */
 export function createComment(body: string) {
-    const { owner, repo } = store.options;
-    const number = store.issue.number;
+    const { owner, repo } = store.state.options;
+    const number = store.state.issue.number;
 
     return http.fetch({
         method: 'POST',
@@ -182,6 +202,7 @@ export function createComment(body: string) {
 
 /**
  * 获取 markdown 对应的html片段
+ * https://docs.github.com/en/rest/reference/markdown#render-a-markdown-document
  *
  * @export
  * @param {string} content
@@ -193,23 +214,25 @@ export function getMarkDown(content: string): Promise<string> {
         url: '/markdown',
         headers: basicAuthHeader(),
         params: {
-            mode: 'gfm',
+            mode: 'gfm', // 默认是 'markdown'，gfm 可能会处理上下文
             text: content
         }
     });
 }
 
 /**
+ * todo: 看下 下面两个 accept
  * 根据 page, per_page 获取某一页的评论
+ * https://docs.github.com/en/rest/reference/issues#list-issue-comments
  *
  * @export
  * @param {number} [page]
- * @param {number} [per_page]
+ * @param {number} [perPage]
  * @returns
  */
-export function getComments(page?: number, per_page?: number) {
-    const { owner, repo } = store.options;
-    const number = store.issue.number;
+export function getComments(page?: number, perPage?: number) {
+    const { owner, repo } = store.state.options;
+    const number = store.state.issue.number;
 
     return http.fetch({
         method: 'GET',
@@ -218,7 +241,6 @@ export function getComments(page?: number, per_page?: number) {
             ...basicAuthHeader(),
             Accept: [
                 // 返回的 comment 带 reactions
-                // https://developer.github.com/v3/issues/comments/#reactions-summary
                 'application/vnd.github.squirrel-girl-preview',
                 // body 的原始markdown，以及渲染的html。 全都要
                 // https://developer.github.com/v3/issues/comments/#custom-media-types
@@ -226,32 +248,29 @@ export function getComments(page?: number, per_page?: number) {
                 'application/vnd.github.VERSION.html+json'
             ].join(',')
         },
-        // 这个参数找不到了，，不知道咋回事。但是还能用
-        // https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
         query: {
-            page: page || store.comments.page,
-            per_page: per_page || store.comments.per_page,
+            page: page || store.state.comments.page,
+            per_page: perPage || store.state.comments.perPage,
             _: Math.random()
         }
     });
 }
 
 /**
- * 获取某comment的点赞信息
+ * 获取某 comment 的点赞信息
+ * https://docs.github.com/en/rest/reference/reactions#list-reactions-for-an-issue-comment
  *
  * @export
  * @param {string} commentId
  * @returns {Promise<any>}
  */
 export function commentReactions(commentId: string): Promise<any> {
-    const { owner, repo } = store.options;
+    const { owner, repo } = store.state.options;
     return http.fetch({
         method: 'GET',
         url: `/repos/${owner}/${repo}/issues/comments/${commentId}/reactions?_=${Math.random()}`,
         headers: {
             ...basicAuthHeader(),
-            // 获取 issue 的 reactions
-            // https://developer.github.com/v3/reactions/#list-reactions-for-an-issue-comment
             Accept: 'application/vnd.github.squirrel-girl-preview+json'
         }
     });
@@ -263,20 +282,20 @@ export function commentReactions(commentId: string): Promise<any> {
 
 /**
  * 给 issue 点赞
+ * https://docs.github.com/en/rest/reference/reactions#create-reaction-for-an-issue
  *
  * @export
  * @returns
  */
 export function heartIssue() {
-    const { owner, repo } = store.options;
-    const number = store.issue.number;
+    const { owner, repo } = store.state.options;
+    const number = store.state.issue.number;
 
     return http.fetch({
         method: 'POST',
         url: `/repos/${owner}/${repo}/issues/${number}/reactions`,
         headers: {
             ...tokenAuthHeader(),
-            // https://developer.github.com/v3/reactions/#create-reaction-for-an-issue
             Accept: 'application/vnd.github.squirrel-girl-preview+json'
         },
         params: {
@@ -286,8 +305,10 @@ export function heartIssue() {
 }
 
 /**
+ * todo: 替换为新 api
  * 取消issue的赞
- * https://developer.github.com/v3/reactions/#delete-a-reaction
+ * https://docs.github.com/en/rest/reference/reactions#delete-a-reaction-legacy
+ * https://developer.github.com/changes/2020-02-26-new-delete-reactions-endpoints/
  *
  * @export
  * @param {string} id heart的id
@@ -306,14 +327,14 @@ export function deleteIssueHeart(heartId: string) {
 
 /**
  * 给 comment 点赞
- * https://developer.github.com/v3/reactions/#create-reaction-for-an-issue-comment
+ * https://docs.github.com/en/rest/reference/reactions#create-reaction-for-an-issue-comment
  *
  * @export
  * @param {string} commentId
  * @returns
  */
 export function heartComment(commentId: string) {
-    const { owner, repo } = store.options;
+    const { owner, repo } = store.state.options;
 
     return http.fetch({
         method: 'POST',
@@ -329,7 +350,9 @@ export function heartComment(commentId: string) {
 }
 
 /**
+ * todo: 使用新 api
  * 取消 comment 的赞
+ * https://docs.github.com/en/rest/reference/reactions#delete-an-issue-comment-reaction
  *
  * @export
  * @param {*} heartId

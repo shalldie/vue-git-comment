@@ -1,49 +1,42 @@
 <template>
     <ul class="comment-pagination">
-        <!-- <li @click="prevPage" :class="{disabled:store.comments.page<=1}" class="comment-page-item">Prev page</li> -->
+        <!-- <li @click="prevPage" :class="{disabled:state.comments.page<=1}" class="comment-page-item">Prev page</li> -->
         <li
             @click="fetchPage(index + 1)"
             v-for="(item, index) in pageCount"
             :key="index"
-            :class="{ disabled: index + 1 == store.comments.page }"
+            :class="{ disabled: index + 1 == state.comments.page }"
             class="comment-page-item"
         >
             {{ index + 1 }}
         </li>
-        <li @click="nextPage" :class="{ disabled: store.comments.page >= pageCount }" class="comment-page-item">
+        <li @click="nextPage" :class="{ disabled: state.comments.page >= pageCount }" class="comment-page-item">
             {{ i('Next page') }}
         </li>
     </ul>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Inject } from 'vue-property-decorator';
-import store, { StateStore } from '../lib/store';
-import gitComment from '../lib/gitComment';
-import i18n from '../lib/i18n';
+import { Component, BaseComponent } from '~/lib/decorators';
+import { gm } from '~/lib/gitcomment';
 
 @Component
-export default class CommentPagination extends Vue {
-    i = i18n;
-
-    @Inject()
-    store!: StateStore;
-
+export default class CommentHeader extends BaseComponent {
     get pageCount() {
-        const { per_page, count } = this.store.comments;
-        return Math.ceil(count / per_page) || 1;
+        const { perPage, count } = this.state.comments;
+        return Math.ceil(count / perPage) || 1;
     }
 
     nextPage() {
-        this.fetchPage(this.store.comments.page + 1);
+        this.fetchPage(this.state.comments.page + 1);
     }
 
     fetchPage(page: number) {
-        if (this.store.comments.page === page || page <= 0 || page > this.pageCount) {
+        if (this.state.comments.page === page || page <= 0 || page > this.pageCount) {
             return;
         }
-        store.comments.page = page;
-        gitComment.getCurrentPage();
+        this.state.comments.page = page;
+        gm.fetchCurrentPage();
     }
 }
 </script>

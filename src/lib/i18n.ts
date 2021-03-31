@@ -1,4 +1,4 @@
-import store from './store';
+import { store } from './store';
 
 const languages = {
     // comment header
@@ -64,8 +64,8 @@ const languages = {
     }
 };
 
-export default function(key: string, map = languages) {
-    const lang = store.options.language;
+export function i18n(key: string, map = languages) {
+    const lang = store.state.options.language;
     const item = map[key];
 
     if (item[lang]) {
