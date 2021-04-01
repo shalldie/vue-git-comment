@@ -83,7 +83,7 @@ export default {
 | language     | `en \| zh-CN` | `false`  |       `en`       | 国际化语言，选填。 默认使用 `en`              |
 | proxy        |   `string`    | `false`  |     `见下方`     | 获取 accessToken 的代理                       |
 
-    默认代理使用 `https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token`
+默认代理使用 `https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token`
 
 ## Similar Project
 
