@@ -123,6 +123,6 @@ gitalk 我也特地去了解了一哈，也是非常优秀的一个项目。但�
 [npm_url]: https://www.npmjs.com/package/vue-git-comment
 [travis_image]: https://img.shields.io/travis/shalldie/vue-git-comment/master.svg
 [travis_url]: https://travis-ci.org/shalldie/vue-git-comment
-[gzip_image]: https://img.badgesize.io/https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.13/dist/vue-git-comment.umd.min.js?compression=gzip
-[gzip_url]: https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.13/dist/vue-git-comment.umd.min.js
+[gzip_image]: https://img.badgesize.io/https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.16/dist/vue-git-comment.umd.min.js?compression=gzip
+[gzip_url]: https://cdn.jsdelivr.net/npm/vue-git-comment@0.0.16/dist/vue-git-comment.umd.min.js
 [license_image]: https://img.shields.io/npm/l/vue-git-comment.svg
