@@ -1,6 +1,6 @@
 {
   "name": "vue-git-comment",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "description": "A vue's comment component base on github's issues.",
   "main": "dist/vue-git-comment.umd.js",
   "files": [
