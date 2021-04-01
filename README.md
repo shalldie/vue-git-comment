@@ -2,7 +2,7 @@
 
 [![npm][npm_image]][npm_url] [![travis][travis_image]][travis_url] [![gzip][gzip_image]][gzip_url] [![license][license_image]][npm_url]
 
-这是一个基于 `github issues` 和 `vue` 的纯前端评论组件，不需要后端。
+这是一个基于 `github issues` 和 `vue` 的纯前端评论组件，不需要服务端。
 
 ## Live Demo
 
@@ -97,7 +97,7 @@ export default {
     1.  作者自己搭了个服务去转发获取 token，我生怕哪一天...
 
         这里我用的是 [cros-anywhere](https://cors-anywhere.herokuapp.com) 去转发，
-        哪怕有一天 anywhere 也挂了，我既然明白这个问题也能迅速定位。
+        哪怕有一天 anywhere 也挂了，也可以通过自定义 proxy 来调整。
 
     2.  在移动端上稍微不太友好。
     3.  不能倒序。
