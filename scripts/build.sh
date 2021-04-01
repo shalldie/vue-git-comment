@@ -7,9 +7,6 @@ BASE_PATH=$(cd `dirname $BASE_PATH`; pwd)
 # 定位到 root
 cd $BASE_PATH
 
-# 删除旧的产出
-rm -rf dist
-
 # 构建
 npm run vue-build
 

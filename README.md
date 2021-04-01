@@ -2,7 +2,7 @@
 
 [![npm][npm_image]][npm_url] [![travis][travis_image]][travis_url] [![gzip][gzip_image]][gzip_url] [![license][license_image]][npm_url]
 
-这是一个基于 `github issues` 和 `vue` 的纯前端评论组件，不需要后端。
+这是一个基于 `github issues` 和 `vue` 的纯前端评论组件，不需要服务端。
 
 ## Live Demo
 
@@ -56,8 +56,8 @@ export default {
     data() {
         return {
             options: {
-                client_id: 'client_id',
-                client_secret: 'client_secret',
+                clientID: 'clientID',
+                clientSecret: 'clientSecret',
                 owner: '仓库所有者',
                 repo: '仓库名称',
                 uuid: '唯一标识，用于区分不同文章'
@@ -72,15 +72,16 @@ export default {
 
 评论系统基于 `github api` ， 需要 [去申请](https://github.com/settings/applications/new) 一个 `OAuth application`。
 
-| Name          |     Type      | Required |     Default      | Description                                   |
-| :------------ | :-----------: | :------: | :--------------: | :-------------------------------------------- |
-| client_id     |   `string`    |  `true`  |                  | 申请的 client_id                              |
-| client_secret |   `string`    |  `true`  |                  | 申请的 client_secret                          |
-| owner         |   `string`    |  `true`  |                  | issue 所在仓库的所有者                        |
-| repo          |   `string`    |  `true`  |                  | 仓库名称                                      |
-| uuid          |   `string`    |  `true`  |                  | 用于区分文章的唯一标识，每个评论间不能重复    |
-| title         |   `string`    | `false`  | `document.title` | issue 使用的标题，选填。 默认使用当前页面标题 |
-| language      | `en \| zh-CN` | `false`  |       `en`       | 国际化语言，选填。 默认使用 `en`              |
+| Name         |     Type      | Required |                                       Default                                       | Description                                   |
+| :----------- | :-----------: | :------: | :---------------------------------------------------------------------------------: | :-------------------------------------------- |
+| clientID     |   `string`    |  `true`  |                                                                                     | 申请的 client_id                              |
+| clientSecret |   `string`    |  `true`  |                                                                                     | 申请的 client_secret                          |
+| owner        |   `string`    |  `true`  |                                                                                     | issue 所在仓库的所有者                        |
+| repo         |   `string`    |  `true`  |                                                                                     | 仓库名称                                      |
+| uuid         |   `string`    |  `true`  |                                                                                     | 用于区分文章的唯一标识，每个评论间不能重复    |
+| title        |   `string`    | `false`  |                                  `document.title`                                   | issue 使用的标题，选填。 默认使用当前页面标题 |
+| language     | `en \| zh-CN` | `false`  |                                        `en`                                         | 国际化语言，选填。 默认使用 `en`              |
+| proxy        |   `string`    | `false`  | `https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token` | 获取 accessToken 的代理                       |
 
 ## Similar Project
 
@@ -96,7 +97,7 @@ export default {
     1.  作者自己搭了个服务去转发获取 token，我生怕哪一天...
 
         这里我用的是 [cros-anywhere](https://cors-anywhere.herokuapp.com) 去转发，
-        哪怕有一天 anywhere 也挂了，我既然明白这个问题也能迅速定位。
+        哪怕有一天 anywhere 也挂了，也可以通过自定义 proxy 来调整。
 
     2.  在移动端上稍微不太友好。
     3.  不能倒序。

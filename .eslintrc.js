@@ -14,19 +14,13 @@ module.exports = {
         ecmaVersion: 2020
     },
     rules: {
-        'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        indent: [
-            'error',
-            4,
-            {
-                SwitchCase: 1
-            }
-        ],
+        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+        'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
         'prefer-const': ['error', { destructuring: 'all' }],
+        'no-async-promise-executor': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
+        '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
-        'vue/html-indent': ['error', 4],
-        '@typescript-eslint/interface-name-prefix': 'off',
-        '@typescript-eslint/camelcase': 'off'
+        '@typescript-eslint/no-non-null-assertion': 'off'
     }
 };

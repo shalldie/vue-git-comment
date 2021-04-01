@@ -1,16 +1,16 @@
 <template>
     <div class="comment-body">
         <div v-if="creating">Creating...</div>
-        <div v-else-if="!store.issue.created && store.options.owner === store.userInfo.name">
+        <div v-else-if="!state.issue.created && state.options.owner === state.userInfo.name">
             {{ i('Seems new,') }}
             <a @click="createIssue" href="javascript:void(0)">{{ i('Click') }}</a>
             {{ i('to create an issue.') }}
         </div>
-        <div v-else-if="store.comments.loading" class="comment-loading" v-html="spinnerIcon"></div>
+        <div v-else-if="state.comments.loading" class="comment-loading" v-html="icons.spinnerIcon"></div>
         <div v-else class="comment-list">
-            <div v-for="(item, index) in store.comments.list" :key="index" class="markdown-body comment-list-item">
+            <div v-for="(item, index) in state.comments.list" :key="index" class="markdown-body comment-list-item">
                 <a :href="item.user.link" target="_blank">
-                    <img :src="item.user.avatar_url" class="user-avatar" />
+                    <img :src="item.user.avatarUrl" class="user-avatar" />
                 </a>
                 <div class="comment-item-main border-arrow">
                     <!-- 评论的头部 -->
@@ -19,7 +19,7 @@
                         <div class="cim-info-wrap">
                             <a class="cim-name" target="_blank" :href="item.user.link">{{ item.user.name }}</a>
                             <span class="cim-time"> {{ i('commented on') }} </span>
-                            <span class="cim-time">{{ item.created_at }}</span>
+                            <span class="cim-time">{{ item.createdAt }}</span>
                         </div>
                         <!-- 评论的反馈 reaction -->
                         <div class="cim-reaction">
@@ -29,26 +29,26 @@
                                 class="cim-heart-item"
                                 :class="{
                                     liked: heartMap[index],
-                                    disabled: !store.state.ifLogin,
+                                    disabled: !state.ifLogin,
                                     'vgc-busy': item.heartLoading
                                 }"
                             >
                                 <!-- heart 的icon -->
-                                <span v-if="!item.heartLoading" class="cim-heart-icon" v-html="heartIcon"></span>
+                                <span v-if="!item.heartLoading" class="cim-heart-icon" v-html="icons.heartIcon"></span>
                                 <!-- loading 的icon -->
-                                <span v-else class="cim-heart-icon vgc-rotate" v-html="spinnerIcon"></span>
+                                <span v-else class="cim-heart-icon vgc-rotate" v-html="icons.spinnerIcon"></span>
                                 <span class="cim-heart-num">{{ item.likedList.length || '' }}</span>
                             </span>
                             <!-- reply -->
                             <span
                                 @click="handleReply(item)"
-                                :class="{ disabled: !store.state.ifLogin }"
+                                :class="{ disabled: !state.ifLogin }"
                                 class="cim-reply-item"
-                                v-html="replyIcon"
+                                v-html="icons.replyIcon"
                             ></span>
                         </div>
                     </div>
-                    <div class="cim-body" v-html="item.body_html"></div>
+                    <div class="cim-body" v-html="item.bodyHtml"></div>
                 </div>
             </div>
         </div>
@@ -56,83 +56,72 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Inject } from 'vue-property-decorator';
+import { Vue, Component, BaseComponent } from '~/lib/decorators';
 import { StateStore } from '../lib/store';
-import gitComment from '../lib/gitComment';
-import { heartIcon, spinnerIcon, replyIcon } from '../lib/icons';
 import * as github from '../lib/github';
-import CommentEditor from './CommentEditor.vue';
-import i18n from '../lib/i18n';
+// import CommentEditor from './CommentEditor.vue';
+import { gm } from '~/lib/gitcomment';
 
 @Component
-export default class CommentBody extends Vue {
-    i = i18n;
-
-    heartIcon = heartIcon;
-    spinnerIcon = spinnerIcon;
-    replyIcon = replyIcon;
-
+export default class CommentHeader extends BaseComponent {
     creating = false;
-
-    @Inject()
-    store!: StateStore;
 
     /**
      * 是否 `heart` 的字典
      */
     get heartMap() {
-        return this.store.comments.list.map(n => {
-            return n.likedList.some(item => item.name == this.store.userInfo.name);
+        return this.state.comments.list.map(n => {
+            return n.likedList.some(item => item.name == this.state.userInfo.name);
         });
     }
 
-    createIssue() {
+    async createIssue() {
         this.creating = true;
-        gitComment.createIssue().then(() => {
-            this.creating = false;
-            this.store.issue.created = true;
-            gitComment.init(this.store.options);
-        });
+        await gm.createIssue();
+        this.creating = false;
+        this.state.issue.created = true;
+        gm.init(this.state.options);
     }
 
-    toggleHeart(index) {
-        if (!this.store.state.ifLogin) {
+    async toggleHeart(index: number) {
+        if (!this.state.ifLogin) {
             return;
         }
         const loadingKey = 'heartLoading';
-        const commentItem = this.store.comments.list[index];
+        const commentItem = this.state.comments.list[index];
 
         if (commentItem[loadingKey]) {
             return;
         }
 
         Vue.set(commentItem, loadingKey, true);
+
+        // 没 heart，就去 heart
         if (this.heartMap[index]) {
-            const heartId = commentItem.likedList.filter(item => item.name == this.store.userInfo.name)[0].id;
-            github.deleteCommentHeart(heartId).then(() => {
-                commentItem.likedList = commentItem.likedList.filter(n => n.name != this.store.userInfo.name);
-                // this.store.comments.list = this.store.comments.list.slice();
-                Vue.set(commentItem, loadingKey, false);
-            });
+            const heartId = commentItem.likedList.filter(item => item.name == this.state.userInfo.name)[0].id;
+            await github.deleteCommentHeart(heartId);
+            commentItem.likedList = commentItem.likedList.filter(n => n.name != this.state.userInfo.name);
+            Vue.set(commentItem, loadingKey, false);
             return;
         }
-        github.heartComment(commentItem.id + '').then(result => {
-            commentItem.likedList.push({
-                id: result.id,
-                name: result.user.login
-            });
-            Vue.set(commentItem, loadingKey, false);
-            // this.store.comments.list = this.store.comments.list.slice();
+        // 否则去取消 heart
+        const result = await github.heartComment(commentItem.id + '');
+        commentItem.likedList.push({
+            id: result.id,
+            name: result.user.login
         });
+        Vue.set(commentItem, loadingKey, false);
     }
 
-    handleReply(item: StateStore['comments']['list'][number]) {
+    handleReply(item: StateStore['state']['comments']['list'][number]) {
         if (!this.store.state.ifLogin) {
             return;
         }
 
         const content = [`@${item.user.name}`, ...item.body.split('\n')].map(line => `> ${line}`).join('\n') + '\n';
-        const editor = this.$parent.$refs.editor as CommentEditor;
+
+        // todo: 代码优化下
+        const editor = this.$parent.$refs.editor as any;
         editor.showArea = true;
         this.$nextTick(() => {
             editor.areaContent = content;
