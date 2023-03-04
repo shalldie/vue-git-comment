@@ -40,7 +40,7 @@
                     class="ce-textarea"
                     :placeholder="i('Leave a comment.')"
                 ></textarea>
-                <div v-show="!showArea" class="markdown-body ce-preview" v-html="markdownContent"></div>
+                <div v-show="!showArea" class="vgc-markdown-body ce-preview" v-html="markdownContent"></div>
             </div>
             <div class="ce-comment-row">
                 <div class="ce-link-wrap">

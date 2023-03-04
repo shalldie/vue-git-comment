@@ -57,7 +57,7 @@ export default class VueGitComment extends BaseComponent {
 
 .vue-git-comment {
     color: #333;
-    font-family: sans-serif;
+    /* font-family: sans-serif; */
 
     // 全局 border-box
     * {

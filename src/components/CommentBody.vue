@@ -8,7 +8,7 @@
         </div>
         <div v-else-if="state.comments.loading" class="comment-loading" v-html="icons.spinnerIcon"></div>
         <div v-else class="comment-list">
-            <div v-for="(item, index) in state.comments.list" :key="index" class="markdown-body comment-list-item">
+            <div v-for="(item, index) in state.comments.list" :key="index" class="vgc-markdown-body comment-list-item">
                 <a :href="item.user.link" target="_blank">
                     <img :src="item.user.avatarUrl" class="user-avatar" />
                 </a>

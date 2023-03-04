@@ -18,7 +18,6 @@ link:
 ```html
 <script src="lib/vue.js"></script>
 
-<link href="dist/vue-git-comment.css" rel="stylesheet" />
 <script src="dist/vue-git-comment.umd.min.js"></script>
 ```
 
@@ -31,7 +30,6 @@ npm install vue-git-comment --save
 ## Usage
 
 ```js
-import 'vue-git-comment/dist/vue-git-comment.css';
 import VueGitComment from 'vue-git-comment';
 
 // var VueGitComment = window.VueGitComment;  // window

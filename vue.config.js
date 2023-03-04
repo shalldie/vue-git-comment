@@ -10,7 +10,7 @@ module.exports = {
     },
 
     css: {
-        extract: true,
+        extract: false,
         loaderOptions: {
             scss: {
                 additionalData:
